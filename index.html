@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>✨ AR Гра "Керуй Емоціями" ✨</title>
+    <title>✨ AR Гра до Дня Смайла ✨</title>
 
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/IdeaSpaceVR/aframe-particle-system-component@1.1.x/dist/aframe-particle-system-component.min.js"></script>
 
     <style>
         html, body {
@@ -65,65 +64,23 @@
             background: linear-gradient(45deg, #007BFF, #0056b3);
             color: white;
         }
-        #stopBtn {
-            bottom: 100px;
-            background: linear-gradient(45deg, #ff0000, #b30000);
+        #youtubeBtn {
+            bottom: 40px;
+            background: linear-gradient(45deg, #ff0044, #ff6600);
             color: white;
+            text-align: center;
         }
         #resetBtn {
             bottom: 40px;
             background: linear-gradient(45deg, #FF5733, #e64a19);
             color: white;
         }
-        #youtubeBtn {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            transform: none;
-            padding: 10px 18px;
-            background: linear-gradient(45deg, #cc0000, #ff5757);
-            color: white;
-            border-radius: 20px;
-            font-size: 0.9em;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            display: none;
-            transition: none;
-        }
-        #youtubeBtn:hover {
-            transform: none;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
-        }
-        .ui-info-text {
-            position: fixed;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            font-family: 'Comic Sans MS', cursive, sans-serif;
-            text-align: center;
-        }
-        #timerText {
-            top: 20px;
-            color: white;
-            font-size: 1.2em;
-            font-weight: bold;
-            display: none;
-        }
-        #scoreText {
-            top: 50px;
-            color: white;
-            font-size: 1.2em;
-            font-weight: bold;
-            display: none;
-        }
     </style>
 </head>
 <body>
     <div class="arjs-loader">
-        <div>Завантаження AR... <br> 🪄 Наведіть камеру на зображення!</div>
+        <div>Завантаження AR... <br> 🪄 Наведіть камеру на ваш маркер!</div>
     </div>
-
-    <p id="timerText" class="ui-info-text">Час: 01:00</p>
-    <p id="scoreText" class="ui-info-text">Радість: 0</p>
 
     <a-scene
         mindar-image="imageTargetSrc: ./targets.mind;"
@@ -135,8 +92,6 @@
     >
         <a-assets>
             <img id="logo-img" src="./logo.png" crossorigin="anonymous">
-            <audio id="bg-music" src="./bg-music.mp3" preload="auto"></audio>
-            <img id="sparkle-texture" src="https://raw.githubusercontent.com/IdeaSpaceVR/aframe-particle-system-component/master/dist/images/star.png">
         </a-assets>
 
         <a-camera
@@ -144,7 +99,7 @@
             position="0 0 0"
         >
             <a-cursor
-                raycaster="objects: .emotion-emoji;"
+                raycaster="objects: .choice-text;"
                 cursor="fuse: true; maxDistance: 30; timeout: 500"
                 position="0 0 -1"
                 geometry="primitive: ring; radiusOuter: 0.01; radiusInner: 0.005"
@@ -162,35 +117,27 @@
             ></a-image>
 
             <a-entity id="game-elements" visible="false">
-                <a-text class="emotion-emoji negative-emoji" value="😭" position="-0.5 0.2 0" scale="1 1 1"></a-text>
-                <a-text class="emotion-emoji negative-emoji" value="😠" position="0 0.2 0" scale="1 1 1"></a-text>
-                <a-text class="emotion-emoji negative-emoji" value="🤢" position="0.5 0.2 0" scale="1 1 1"></a-text>
-                <a-text class="emotion-emoji negative-emoji" value="😨" position="-0.5 -0.2 0" scale="1 1 1"></a-text>
-                <a-text class="emotion-emoji negative-emoji" value="😭" position="0 -0.2 0" scale="1 1 1"></a-text>
+                <a-text
+                    id="question-text"
+                    value=""
+                    position="0 0.8 0"
+                    align="center"
+                    width="1.8"
+                    color="#FFFFFF"
+                    font="https://cdn.aframe.io/fonts/DejaVuSansMono-Bold.fnt"
+                ></a-text>
 
-                <a-entity id="sparkle-emitter" particle-system="
-                    preset: star;
-                    texture: #sparkle-texture;
-                    color: #FFD700,#FFFF00;
-                    size: 0.1;
-                    duration: 0.5;
-                    particleCount: 20;
-                    velocitySpread: 0.2 0.2 0.2;
-                    positionSpread: 0.05 0.05 0.05;
-                    maxAge: 0.5;
-                    rotationSpread: 180;
-                    blending: 1;
-                    loop: false;
-                    enabled: false;
-                "></a-entity>
+                <a-text id="laughing-emoji" class="choice-text" value="😂" position="-0.5 0.2 0" scale="0.3 0.3 0.3" material="transparent: true; opacity: 1;"></a-text>
+                <a-text id="happy-emoji" class="choice-text" value="😊" position="0 0.2 0" scale="0.3 0.3 0.3" material="transparent: true; opacity: 1;"></a-text>
+                <a-text id="crying-emoji" class="choice-text" value="😭" position="0.5 0.2 0" scale="0.3 0.3 0.3" material="transparent: true; opacity: 1;"></a-text>
             </a-entity>
         </a-entity>
     </a-scene>
 
     <button id="playBtn" class="ui-btn">▶️ ГРАТИ</button>
-    <button id="stopBtn" class="ui-btn" style="display: none;">⏹️ СТОП</button>
     <button id="resetBtn" class="ui-btn">🔄 Повернутися</button>
-    <a href="https://www.youtube.com/@23smartlessa32?si=d3NhKDot8U8Mc2Hi" id="youtubeBtn" target="_blank">Автор SmartLessa</a>
+    <a href="https://youtube.com/playlist?list=PL6UDFwT9TzFxsVdFiEBsQ9yFpcYRPOpfO&si=IyXv1SkdPyvhcW7Z"
+       id="youtubeBtn" class="ui-btn" target="_blank">👉 Дивись більше</a>
 
     <script>
         function fixHeight() {
@@ -203,183 +150,98 @@
         const targetEntity = document.querySelector('a-entity[mindar-image-target]');
         const logoImage = document.querySelector('#logo-image');
         const playBtn = document.querySelector('#playBtn');
-        const stopBtn = document.querySelector('#stopBtn'); // Нова кнопка
         const resetBtn = document.querySelector('#resetBtn');
         const youtubeBtn = document.querySelector('#youtubeBtn');
         const gameElements = document.querySelector('#game-elements');
-        const timerText = document.querySelector('#timerText');
-        const scoreText = document.querySelector('#scoreText');
-        const bgMusic = document.querySelector('#bg-music');
-        const sparkleEmitter = document.querySelector('#sparkle-emitter');
+        const questionText = document.querySelector('#question-text');
         
-        let score = 0;
-        let timer = 60;
-        let gameInterval;
-        let movementInterval;
-        let isGameRunning = false;
+        const choices = {
+            'laughing-emoji': document.querySelector('#laughing-emoji'),
+            'happy-emoji': document.querySelector('#happy-emoji'),
+            'crying-emoji': document.querySelector('#crying-emoji')
+        };
 
-        const negativeEmojis = ['😭', '😠', '🤢', '😨'];
-        const positiveEmojis = ['😊', '😂', '🤩', '🥳'];
-
-        function updateTimerDisplay() {
-            const minutes = Math.floor(timer / 60);
-            const seconds = timer % 60;
-            const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-            timerText.textContent = `Час: ${formattedTime}`;
-        }
+        let currentQuestionIndex = 0;
+        const questions = [
+            { text: "Який смайл показує, що ти щасливий?", correct: "happy-emoji" },
+            { text: "Який смайл показує, що ти смієшся?", correct: "laughing-emoji" },
+            { text: "Який смайл показує, що ти засмучений?", correct: "crying-emoji" }
+        ];
 
         targetEntity.addEventListener('targetFound', function () {
             loader.style.display = 'none';
-            if (!isGameRunning) {
-                playBtn.style.display = 'block';
-                youtubeBtn.style.display = 'block';
-                logoImage.setAttribute('visible', 'true');
-            }
+            playBtn.style.display = 'block';
+            youtubeBtn.style.display = 'block';
+            logoImage.setAttribute('visible', 'true');
         });
 
         targetEntity.addEventListener('targetLost', function () {
-            if (!isGameRunning) {
-                playBtn.style.display = 'none';
-                youtubeBtn.style.display = 'none';
-                resetBtn.style.display = 'none';
-                logoImage.setAttribute('visible', 'true');
-                gameElements.setAttribute('visible', 'false');
-                timerText.style.display = 'none';
-                scoreText.style.display = 'none';
-            }
+            playBtn.style.display = 'none';
+            resetBtn.style.display = 'none';
+            youtubeBtn.style.display = 'none';
+            logoImage.setAttribute('visible', 'true');
+            gameElements.setAttribute('visible', 'false');
+            currentQuestionIndex = 0;
         });
 
-        playBtn.addEventListener('click', startGame);
-        stopBtn.addEventListener('click', stopGame); // Новий обробник для кнопки "Стоп"
-        resetBtn.addEventListener('click', resetGame);
-
-        function startGame() {
-            isGameRunning = true;
-            score = 0;
-            timer = 60;
-            scoreText.textContent = `Радість: ${score}`;
-            updateTimerDisplay();
-
-            logoImage.setAttribute('visible', 'false');
-            gameElements.setAttribute('visible', 'true');
-            timerText.style.display = 'block';
-            scoreText.style.display = 'block';
+        playBtn.addEventListener('click', function () {
             playBtn.style.display = 'none';
             youtubeBtn.style.display = 'none';
-            stopBtn.style.display = 'block'; // Показуємо кнопку "Стоп"
-            
-            bgMusic.play();
+            startGame();
+        });
 
-            movementInterval = setInterval(moveEmojis, 1000);
-            
-            gameInterval = setInterval(() => {
-                timer--;
-                updateTimerDisplay();
-                if (timer <= 0) {
-                    endGame();
-                }
-            }, 1000);
-        }
-
-        function stopGame() {
-            if (!isGameRunning) return;
-            isGameRunning = false;
-            clearInterval(gameInterval);
-            clearInterval(movementInterval);
-            bgMusic.pause();
-            bgMusic.currentTime = 0;
-
-            // Ховаємо смайли та показуємо кнопки "Грати" і "Скинути"
-            gameElements.setAttribute('visible', 'false');
-            stopBtn.style.display = 'none';
-            resetBtn.style.display = 'block';
-            playBtn.style.display = 'block'; // Додано, щоб можна було почати гру знову
-            youtubeBtn.style.display = 'block';
-            logoImage.setAttribute('visible', 'true');
-        }
-
-        function resetGame() {
-            stopGame(); // Скидаємо гру
+        resetBtn.addEventListener('click', function () {
+            resetBtn.style.display = 'none';
             playBtn.style.display = 'block';
             youtubeBtn.style.display = 'block';
-            resetBtn.style.display = 'none';
+            gameElements.setAttribute('visible', 'false');
             logoImage.setAttribute('visible', 'true');
-            score = 0;
-            timer = 60;
-            updateTimerDisplay();
-            scoreText.textContent = `Радість: ${score}`;
-            timerText.style.display = 'none';
-            scoreText.style.display = 'none';
-        }
-        
-        function endGame() {
-            stopGame();
-            
-            document.querySelectorAll('.emotion-emoji').forEach(emoji => {
-                emoji.setAttribute('visible', 'false');
-            });
-            
-            const finalMessage = document.createElement('a-text');
-            finalMessage.setAttribute('value', `Ти наповнив емоціями ${score} разів!`);
-            finalMessage.setAttribute('position', '0 0.5 0');
-            finalMessage.setAttribute('scale', '0.3 0.3 0.3');
-            finalMessage.setAttribute('align', 'center');
-            finalMessage.setAttribute('color', '#FFFFFF');
-            document.querySelector('#game-elements').appendChild(finalMessage);
+            currentQuestionIndex = 0;
+        });
 
-            timerText.style.display = 'none';
-            scoreText.style.display = 'none';
-            
-            sparkleEmitter.setAttribute('particle-system', 'enabled: true; color: #FFD700,#FFFF00; particleCount: 100; maxAge: 2; duration: 0.1; velocity: 0 1 0; velocitySpread: 1 1 1; position: 0 1 0;');
-            
-            setTimeout(() => {
-                sparkleEmitter.setAttribute('particle-system', 'enabled: false;');
-                document.querySelector('#game-elements').removeChild(finalMessage);
-                resetBtn.style.display = 'block';
-            }, 5000);
+        function startGame() {
+            logoImage.setAttribute('visible', 'false');
+            gameElements.setAttribute('visible', 'true');
+            loadQuestion(0);
         }
-        
-        function moveEmojis() {
-            const minX = -0.7;
-            const maxX = 0.7;
-            const minY = -0.5;
-            const maxY = 0.5;
-            
-            document.querySelectorAll('.emotion-emoji').forEach(emoji => {
-                const newPosX = Math.random() * (maxX - minX) + minX;
-                const newPosY = Math.random() * (maxY - minY) + minY;
-                emoji.setAttribute('position', `${newPosX.toFixed(2)} ${newPosY.toFixed(2)} 0`);
-            });
-        }
-        
-        document.querySelector('a-scene').addEventListener('click', function (evt) {
-            const target = evt.target;
-            if (target.classList.contains('negative-emoji')) {
-                score++;
-                scoreText.textContent = `Радість: ${score}`;
-                
-                const originalValue = target.getAttribute('value');
-                const originalPosition = target.getAttribute('position');
 
-                sparkleEmitter.setAttribute('position', originalPosition);
-                sparkleEmitter.setAttribute('particle-system', 'enabled: true;');
+        function loadQuestion(index) {
+            if (index >= questions.length) {
+                questionText.setAttribute('value', "🎉 Ти пройшов гру! Вітаємо!");
                 setTimeout(() => {
-                    sparkleEmitter.setAttribute('particle-system', 'enabled: false;');
-                }, 100);
-
-                const randomPositiveEmoji = positiveEmojis[Math.floor(Math.random() * positiveEmojis.length)];
-                target.setAttribute('value', randomPositiveEmoji);
-                
-                setTimeout(() => {
-                    target.setAttribute('value', originalValue);
-                }, 1000);
-            } else if (target.classList.contains('positive-emoji')) {
-                const originalScale = target.getAttribute('scale');
-                target.setAttribute('scale', '1.2 1.2 1.2');
-                setTimeout(() => {
-                    target.setAttribute('scale', originalScale);
-                }, 200);
+                    questionText.setAttribute('value', "");
+                    gameElements.setAttribute('visible', 'false');
+                    resetBtn.style.display = 'block';
+                }, 2000);
+                return;
             }
+
+            currentQuestionIndex = index;
+            const currentQuestion = questions[currentQuestionIndex];
+            questionText.setAttribute('value', currentQuestion.text);
+            
+            // Скидаємо стилі смайлів
+            document.querySelectorAll('.choice-text').forEach(emoji => {
+                emoji.setAttribute('material', 'transparent: true; opacity: 1;');
+            });
+        }
+
+        document.querySelectorAll('.choice-text').forEach(emoji => {
+            emoji.addEventListener('click', function () {
+                const selectedEmojiId = this.id;
+                const currentQuestion = questions[currentQuestionIndex];
+                const isCorrect = selectedEmojiId === currentQuestion.correct;
+
+                if (isCorrect) {
+                    questionText.setAttribute('value', "✅ Правильно!");
+                    this.setAttribute('material', 'transparent: true; opacity: 0.5;'); // Зробимо смайл прозорим
+                    setTimeout(() => {
+                        loadQuestion(currentQuestionIndex + 1);
+                    }, 1500);
+                } else {
+                    questionText.setAttribute('value', "❌ Ой, спробуй ще раз!");
+                }
+            });
         });
     </script>
 </body>
