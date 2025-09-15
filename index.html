@@ -1,81 +1,330 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AR Пазл Фото</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>✨ AR Гра "Керуй Емоціями" ✨</title>
 
-  <!-- A-Frame -->
-  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-  <!-- MindAR -->
-  <script src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/dist/mindar-image.prod.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-  <!-- Super Hands для drag&drop -->
-  <script src="https://cdn.jsdelivr.net/npm/aframe-super-hands-component@4.0.5/dist/aframe-super-hands.min.js"></script>
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        a-scene {
+            width: 100% !important;
+            height: 100% !important;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: transparent;
+        }
+        .arjs-loader {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            font-size: 1.5em;
+            text-align: center;
+        }
+        .ui-btn {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 14px 24px;
+            border-radius: 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-decoration: none;
+            z-index: 1000;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            display: none;
+        }
+        .ui-btn:hover {
+            transform: translateX(-50%) scale(1.05);
+        }
+        #playBtn {
+            bottom: 100px;
+            background: linear-gradient(45deg, #007BFF, #0056b3);
+            color: white;
+        }
+        #resetBtn {
+            bottom: 40px;
+            background: linear-gradient(45deg, #FF5733, #e64a19);
+            color: white;
+        }
+        #youtubeBtn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            transform: none;
+            padding: 10px 18px;
+            background: linear-gradient(45deg, #cc0000, #ff5757);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9em;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            display: none;
+            transition: none;
+        }
+        #youtubeBtn:hover {
+            transform: none;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+        .ui-info-text {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            text-align: center;
+        }
+        #timerText {
+            top: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+            display: none;
+        }
+        #scoreText {
+            top: 50px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+            display: none;
+        }
+    </style>
 </head>
-<body style="margin:0; padding:0; overflow:hidden;">
+<body>
+    <div class="arjs-loader">
+        <div>Завантаження AR... <br> 🪄 Наведіть камеру на ваш маркер!</div>
+    </div>
 
-  <!-- Кнопка завантаження фото -->
-  <input type="file" id="upload" accept="image/*" style="position:absolute; z-index:10; top:10px; left:10px;">
+    <p id="timerText" class="ui-info-text">Час: 01:00</p>
+    <p id="scoreText" class="ui-info-text">Радість: 0</p>
 
-  <a-scene mindar-image="imageTargetSrc: ./targets.mind;" 
-           color-space="sRGB" 
-           embedded 
-           vr-mode-ui="enabled: false" 
-           device-orientation-permission-ui="enabled: false">
+    <a-scene
+        mindar-image="imageTargetSrc: ./targets.mind;"
+        vr-mode-ui="enabled: false"
+        device-orientation-permission-ui="enabled: false"
+        loading-screen="enabled: false"
+        embedded
+        renderer="colorManagement: true; physicallyCorrectLights: true;"
+    >
+        <a-assets>
+            <img id="logo-img" src="./logo.png" crossorigin="anonymous">
+            <audio id="bg-music" src="./bg-music.mp3" preload="auto"></audio>
+        </a-assets>
 
-    <a-assets>
-      <!-- Тут з’явиться завантажене фото -->
-      <img id="puzzle" crossorigin="anonymous"/>
-    </a-assets>
+        <a-camera
+            look-controls="enabled: false"
+            position="0 0 0"
+        >
+            <a-cursor
+                raycaster="objects: .emotion-emoji;"
+                cursor="fuse: true; maxDistance: 30; timeout: 500"
+                position="0 0 -1"
+                geometry="primitive: ring; radiusOuter: 0.01; radiusInner: 0.005"
+                material="color: #FFFFFF; shader: flat"
+            ></a-cursor>
+        </a-camera>
 
-    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-    <a-entity id="cursor" cursor="rayOrigin: mouse"></a-entity>
+        <a-entity mindar-image-target="targetIndex: 0">
+            <a-image
+                id="logo-image"
+                src="#logo-img"
+                position="0 0 0.05"
+                rotation="45 0 0"
+                scale="3 3 3"
+            ></a-image>
 
-    <!-- Маркер -->
-    <a-entity mindar-image-target="targetIndex: 0" id="puzzle-container">
-      <!-- Пазли з'являться тут через JS -->
-    </a-entity>
-  </a-scene>
+            <a-entity id="game-elements" visible="false">
+                <a-text class="emotion-emoji positive-emoji" value="😊" position="-0.5 0.2 0" scale="0.3 0.3 0.3"></a-text>
+                <a-text class="emotion-emoji negative-emoji" value="😭" position="0 0.2 0" scale="0.3 0.3 0.3"></a-text>
+                <a-text class="emotion-emoji negative-emoji" value="😠" position="0.5 0.2 0" scale="0.3 0.3 0.3"></a-text>
+                <a-text class="emotion-emoji negative-emoji" value="🤢" position="-0.5 -0.2 0" scale="0.3 0.3 0.3"></a-text>
+                <a-text class="emotion-emoji negative-emoji" value="😨" position="0 -0.2 0" scale="0.3 0.3 0.3"></a-text>
+            </a-entity>
+        </a-entity>
+    </a-scene>
 
-  <script>
-    const upload = document.getElementById('upload');
-    const img = document.getElementById('puzzle');
-    const container = document.getElementById('puzzle-container');
+    <button id="playBtn" class="ui-btn">▶️ ГРАТИ</button>
+    <button id="resetBtn" class="ui-btn">🔄 Повернутися</button>
+    <a href="https://www.youtube.com/@23smartlessa32?si=d3NhKDot8U8Mc2Hi" id="youtubeBtn" target="_blank">Автор SmartLessa</a>
 
-    upload.addEventListener('change', (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          img.setAttribute('src', e.target.result);
+    <script>
+        function fixHeight() {
+            document.body.style.height = window.innerHeight + 'px';
+        }
+        fixHeight();
+        window.addEventListener('resize', fixHeight);
 
-          // Очистити контейнер
-          container.innerHTML = "";
+        const loader = document.querySelector('.arjs-loader');
+        const targetEntity = document.querySelector('a-entity[mindar-image-target]');
+        const logoImage = document.querySelector('#logo-image');
+        const playBtn = document.querySelector('#playBtn');
+        const resetBtn = document.querySelector('#resetBtn');
+        const youtubeBtn = document.querySelector('#youtubeBtn');
+        const gameElements = document.querySelector('#game-elements');
+        const timerText = document.querySelector('#timerText');
+        const scoreText = document.querySelector('#scoreText');
+        const bgMusic = document.querySelector('#bg-music');
+        
+        let score = 0;
+        let timer = 60;
+        let gameInterval;
+        let movementInterval;
 
-          // Координати для 4 шматків
-          const positions = [
-            {x: -0.3, y: 0.3, offset: "0 0"},
-            {x: 0.3, y: 0.3, offset: "0.5 0"},
-            {x: -0.3, y: -0.3, offset: "0 0.5"},
-            {x: 0.3, y: -0.3, offset: "0.5 0.5"}
-          ];
+        const negativeEmojis = ['😭', '😠', '🤢', '😨'];
+        const positiveEmojis = ['😊', '😂', '🤩', '🥳'];
 
-          positions.forEach((p, i) => {
-            const piece = document.createElement("a-plane");
-            piece.setAttribute("width", "0.5");
-            piece.setAttribute("height", "0.5");
-            piece.setAttribute("position", `${p.x} ${p.y} 0`);
-            piece.setAttribute("grabbable", "");
-            piece.setAttribute("draggable", "");
-            piece.setAttribute("droppable", "");
-            piece.setAttribute("material", `src: #puzzle; shader: flat; repeat: 0.5 0.5; offset: ${p.offset}`);
-            container.appendChild(piece);
-          });
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-  </script>
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timer / 60);
+            const seconds = timer % 60;
+            const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            timerText.textContent = `Час: ${formattedTime}`;
+        }
+
+        targetEntity.addEventListener('targetFound', function () {
+            loader.style.display = 'none';
+            playBtn.style.display = 'block';
+            youtubeBtn.style.display = 'block';
+            logoImage.setAttribute('visible', 'true');
+        });
+
+        targetEntity.addEventListener('targetLost', function () {
+            stopGame();
+            playBtn.style.display = 'none';
+            resetBtn.style.display = 'none';
+            youtubeBtn.style.display = 'none';
+            logoImage.setAttribute('visible', 'true');
+            gameElements.setAttribute('visible', 'false');
+            timerText.style.display = 'none';
+            scoreText.style.display = 'none';
+        });
+
+        playBtn.addEventListener('click', function () {
+            playBtn.style.display = 'none';
+            youtubeBtn.style.display = 'none';
+            startGame();
+        });
+
+        resetBtn.addEventListener('click', function () {
+            stopGame();
+            resetBtn.style.display = 'none';
+            playBtn.style.display = 'block';
+            youtubeBtn.style.display = 'block';
+            gameElements.setAttribute('visible', 'false');
+            logoImage.setAttribute('visible', 'true');
+            score = 0;
+            timer = 60;
+            updateTimerDisplay();
+            scoreText.textContent = `Радість: ${score}`;
+            timerText.style.display = 'none';
+            scoreText.style.display = 'none';
+        });
+
+        function startGame() {
+            score = 0;
+            timer = 60;
+            scoreText.textContent = `Радість: ${score}`;
+            updateTimerDisplay();
+
+            logoImage.setAttribute('visible', 'false');
+            gameElements.setAttribute('visible', 'true');
+            timerText.style.display = 'block';
+            scoreText.style.display = 'block';
+            
+            bgMusic.play();
+
+            movementInterval = setInterval(moveEmojis, 1000);
+            
+            gameInterval = setInterval(() => {
+                timer--;
+                updateTimerDisplay();
+                if (timer <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function stopGame() {
+            clearInterval(gameInterval);
+            clearInterval(movementInterval);
+            bgMusic.pause();
+            bgMusic.currentTime = 0;
+        }
+
+        function endGame() {
+            stopGame();
+            
+            document.querySelectorAll('.emotion-emoji').forEach(emoji => {
+                emoji.setAttribute('visible', 'false');
+            });
+            
+            const finalMessage = document.createElement('a-text');
+            finalMessage.setAttribute('value', `Ти наповнив емоціями ${score} разів!`);
+            finalMessage.setAttribute('position', '0 0.5 0');
+            finalMessage.setAttribute('scale', '0.3 0.3 0.3');
+            finalMessage.setAttribute('align', 'center');
+            finalMessage.setAttribute('color', '#FFFFFF');
+            document.querySelector('#game-elements').appendChild(finalMessage);
+
+            timerText.style.display = 'none';
+            scoreText.style.display = 'none';
+            
+            setTimeout(() => {
+                document.querySelector('#game-elements').removeChild(finalMessage);
+                resetBtn.style.display = 'block';
+            }, 5000);
+        }
+        
+        function moveEmojis() {
+            const minX = -0.7;
+            const maxX = 0.7;
+            const minY = -0.5;
+            const maxY = 0.5;
+            
+            document.querySelectorAll('.emotion-emoji').forEach(emoji => {
+                const newPosX = Math.random() * (maxX - minX) + minX;
+                const newPosY = Math.random() * (maxY - minY) + minY;
+                emoji.setAttribute('position', `${newPosX.toFixed(2)} ${newPosY.toFixed(2)} 0`);
+            });
+        }
+        
+        document.querySelector('a-scene').addEventListener('click', function (evt) {
+            if (evt.target.classList.contains('negative-emoji')) {
+                score++;
+                scoreText.textContent = `Радість: ${score}`;
+                
+                const randomPositiveEmoji = positiveEmojis[Math.floor(Math.random() * positiveEmojis.length)];
+                evt.target.setAttribute('value', randomPositiveEmoji);
+                
+                setTimeout(() => {
+                    const randomNegativeEmoji = negativeEmojis[Math.floor(Math.random() * negativeEmojis.length)];
+                    evt.target.setAttribute('value', randomNegativeEmoji);
+                }, 1000);
+            }
+        });
+    </script>
 </body>
 </html>
+[Free Background Music for kids parties](https://www.youtube.com/watch?v=PMyEgV79EEY)
+Цей відеоролик може бути корисним для вибору фонової музики до гри.
+http://googleusercontent.com/youtube_content/1
