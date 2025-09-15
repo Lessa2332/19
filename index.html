@@ -1,1 +1,261 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎉 AR Гра "Смайлик-Сюрприз!" — до Дня Смайла! 🎈</title>
+
+    <!-- Виправлено: прибрано зайві пробіли -->
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/IdeaSpaceVR/aframe-particle-system-component@1.1.x/dist/aframe-particle-system-component.min.js"></script>
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+        a-scene {
+            width: 100% !important;
+            height: 100% !important;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: transparent;
+        }
+        .arjs-loader {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: #4a154b;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.5em;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .ui-btn {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 16px 30px;
+            border-radius: 40px;
+            font-size: 1.2em;
+            font-weight: bold;
+            text-decoration: none;
+            z-index: 1000;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            display: none;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+        .ui-btn:hover {
+            transform: translateX(-50%) scale(1.07);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+        #playBtn {
+            bottom: 120px;
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            color: white;
+        }
+        #stopBtn {
+            bottom: 120px;
+            background: linear-gradient(45deg, #ff4757, #ff6b81);
+            color: white;
+        }
+        #resetBtn {
+            bottom: 50px;
+            background: linear-gradient(45deg, #54a0ff, #5f27cd);
+            color: white;
+        }
+        #youtubeBtn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            transform: none;
+            padding: 12px 20px;
+            background: linear-gradient(45deg, #ff4757, #ff6348);
+            color: white;
+            border-radius: 25px;
+            font-size: 0.95em;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: none;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+        #youtubeBtn:hover {
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.4);
+        }
+        .ui-info-text {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        #timerText {
+            top: 25px;
+            color: #FFD700;
+            font-size: 1.4em;
+            display: none;
+        }
+        #scoreText {
+            top: 65px;
+            color: #00FF7F;
+            font-size: 1.4em;
+            display: none;
+        }
+        #instruction {
+            position: fixed;
+            bottom: 130px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 1.1em;
+            text-align: center;
+            z-index: 9998;
+            background: rgba(74, 21, 75, 0.8);
+            padding: 15px 25px;
+            border-radius: 20px;
+            max-width: 90%;
+            display: none;
+            line-height: 1.4;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="arjs-loader" id="loader">
+        <div class="pulse">🎉 Ласкаво просимо до гри "Смайлик-Сюрприз!" 🎈</div>
+        <div style="margin-top: 20px; font-size: 1.1em;">
+            Наведи камеру на маркер, щоб почати!<br>
+            <small>Або почекай 5 секунд — гра запуститься сама 😊</small>
+        </div>
+    </div>
+
+    <div id="instruction">
+        🖼️ Потрібен твій маркер! Надрукуй або покажи зображення, яке використовувалось для генерації <code>targets.mind</code>
+    </div>
+
+    <p id="timerText" class="ui-info-text">⏳ Час: 01:00</p>
+    <p id="scoreText" class="ui-info-text">🌟 Смайликів: 0</p>
+
+    <a-scene
+        mindar-image="imageTargetSrc: ./targets.mind;"
+        vr-mode-ui="enabled: false"
+        device-orientation-permission-ui="enabled: false"
+        loading-screen="enabled: false"
+        embedded
+        renderer="colorManagement: true; physicallyCorrectLights: true;"
+    >
+        <a-assets>
+            <!-- Твоя фонова музика -->
+            <audio id="bg-music" src="./bg-music.mp3" preload="auto" muted playsinline crossorigin="anonymous"></audio>
+            <!-- Твій логотип -->
+            <img id="logo-img" src="./logo.png" crossorigin="anonymous" alt="Логотип гри">
+            <!-- Текстура для частинок -->
+            <img id="sparkle-texture" src="https://raw.githubusercontent.com/IdeaSpaceVR/aframe-particle-system-component/master/dist/images/star.png" crossorigin="anonymous" alt="sparkle">
+        </a-assets>
+
+        <a-camera
+            look-controls="enabled: false"
+            position="0 0 0"
+        >
+            <a-cursor
+                raycaster="objects: .emoji;"
+                cursor="fuse: false; maxDistance: 10"
+                position="0 0 -1"
+                geometry="primitive: ring; radiusOuter: 0.015; radiusInner: 0.008"
+                material="color: #FFD700; shader: flat"
+            ></a-cursor>
+        </a-camera>
+
+        <!-- Використовуємо твій маркер: targetIndex: 0 -->
+        <a-entity mindar-image-target="targetIndex: 0">
+            <!-- Логотип, який показується спочатку -->
+            <a-image
+                id="logo-image"
+                src="#logo-img"
+                position="0 0 0.05"
+                rotation="30 0 0"
+                scale="2.5 2.5 2.5"
+                visible="true"
+            ></a-image>
+
+            <a-entity id="game-elements" visible="false">
+                <!-- Великі сумні смайлики — з geometry та material -->
+                <a-entity
+                    class="emoji sad"
+                    geometry="primitive: plane; width: 0.4; height: 0.4"
+                    material="shader: flat; color: #000000; transparent: true; opacity: 0.9"
+                    text="value: 😢; align: center; width: 1.5"
+                    position="-0.12 0.12 0"
+                    scale="1 1 1"
+                ></a-entity>
+
+                <a-entity
+                    class="emoji sad"
+                    geometry="primitive: plane; width: 0.4; height: 0.4"
+                    material="shader: flat; color: #000000; transparent: true; opacity: 0.9"
+                    text="value: 😞; align: center; width: 1.5"
+                    position="0.12 0.12 0"
+                    scale="1 1 1"
+                ></a-entity>
+
+                <a-entity
+                    class="emoji sad"
+                    geometry="primitive: plane; width: 0.4; height: 0.4"
+                    material="shader: flat; color: #000000; transparent: true; opacity: 0.9"
+                    text="value: 😟; align: center; width: 1.5"
+                    position="0 0 0"
+                    scale="1 1 1"
+                ></a-entity>
+
+                <a-entity
+                    class="emoji sad"
+                    geometry="primitive: plane; width: 0.4; height: 0.4"
+                    material="shader: flat; color: #000000; transparent: true; opacity: 0.9"
+                    text="value: 🙁; align: center; width: 1.5"
+                    position="-0.12 -0.12 0"
+                    scale="1 1 1"
+                ></a-entity>
+
+                <a-entity
+                    class="emoji sad"
+                    geometry="primitive: plane; width: 0.4; height: 0.4"
+                    material="shader: flat; color: #000000; transparent: true; opacity: 0.9"
+                    text="value: 😕; align: center; width: 1.5"
+                    position="0.12 -0.12 0"
+                    scale="1 1 1"
+                ></a-entity>
+
+                <!-- Феєрверк -->
+                <a-entity id="firework" particle-system="
+                    preset: star;
+                    texture: #sparkle-texture;
+                    color: #FFD700,#FF4500,#32CD32,#1E90FF,#FF69B4;
+                    size: 0.15;
+        
 
