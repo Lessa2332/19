@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>✨ AR Гра "Керуй Емоціями" ✨</title>
+    <title>✨ AR Гра "Керуй Емоціями" зі спецефектами ✨</title>
 
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/IdeaSpaceVR/aframe-particle-system-component@1.1.x/dist/aframe-particle-system-component.min.js"></script>
 
     <style>
         html, body {
@@ -130,6 +131,7 @@
         <a-assets>
             <img id="logo-img" src="./logo.png" crossorigin="anonymous">
             <audio id="bg-music" src="./bg-music.mp3" preload="auto"></audio>
+            <img id="sparkle-texture" src="https://raw.githubusercontent.com/IdeaSpaceVR/aframe-particle-system-component/master/dist/images/star.png">
         </a-assets>
 
         <a-camera
@@ -160,6 +162,22 @@
                 <a-text class="emotion-emoji negative-emoji" value="😠" position="0.5 0.2 0" scale="0.3 0.3 0.3"></a-text>
                 <a-text class="emotion-emoji negative-emoji" value="🤢" position="-0.5 -0.2 0" scale="0.3 0.3 0.3"></a-text>
                 <a-text class="emotion-emoji negative-emoji" value="😨" position="0 -0.2 0" scale="0.3 0.3 0.3"></a-text>
+
+                <a-entity id="sparkle-emitter" particle-system="
+                    preset: star;
+                    texture: #sparkle-texture;
+                    color: #FFD700,#FFFF00;
+                    size: 0.1;
+                    duration: 0.5;
+                    particleCount: 20;
+                    velocitySpread: 0.2 0.2 0.2;
+                    positionSpread: 0.05 0.05 0.05;
+                    maxAge: 0.5;
+                    rotationSpread: 180;
+                    blending: 1;
+                    loop: false;
+                    enabled: false;
+                "></a-entity>
             </a-entity>
         </a-entity>
     </a-scene>
@@ -185,6 +203,7 @@
         const timerText = document.querySelector('#timerText');
         const scoreText = document.querySelector('#scoreText');
         const bgMusic = document.querySelector('#bg-music');
+        const sparkleEmitter = document.querySelector('#sparkle-emitter');
         
         let score = 0;
         let timer = 60;
@@ -289,10 +308,14 @@
             timerText.style.display = 'none';
             scoreText.style.display = 'none';
             
+            // Запускаємо феєрверк наприкінці гри
+            sparkleEmitter.setAttribute('particle-system', 'enabled: true; color: #FFD700,#FFFF00; particleCount: 100; maxAge: 2; duration: 0.1; velocity: 0 1 0; velocitySpread: 1 1 1; position: 0 1 0;');
+            
             setTimeout(() => {
+                sparkleEmitter.setAttribute('particle-system', 'enabled: false;'); // Вимикаємо емітер
                 document.querySelector('#game-elements').removeChild(finalMessage);
                 resetBtn.style.display = 'block';
-            }, 5000);
+            }, 5000); // Повідомлення та ефект тривають 5 секунд
         }
         
         function moveEmojis() {
@@ -309,22 +332,37 @@
         }
         
         document.querySelector('a-scene').addEventListener('click', function (evt) {
-            if (evt.target.classList.contains('negative-emoji')) {
+            const target = evt.target;
+            if (target.classList.contains('negative-emoji')) {
                 score++;
                 scoreText.textContent = `Радість: ${score}`;
                 
+                const originalValue = target.getAttribute('value'); // Зберігаємо оригінальний смайл
+                const originalPosition = target.getAttribute('position');
+
+                // Відображаємо ефект частинок в місці кліку
+                sparkleEmitter.setAttribute('position', originalPosition);
+                sparkleEmitter.setAttribute('particle-system', 'enabled: true;');
+                setTimeout(() => {
+                    sparkleEmitter.setAttribute('particle-system', 'enabled: false;');
+                }, 100); // Вимикаємо емітер швидко
+
+                // Тимчасово змінюємо смайл на позитивний
                 const randomPositiveEmoji = positiveEmojis[Math.floor(Math.random() * positiveEmojis.length)];
-                evt.target.setAttribute('value', randomPositiveEmoji);
+                target.setAttribute('value', randomPositiveEmoji);
                 
                 setTimeout(() => {
-                    const randomNegativeEmoji = negativeEmojis[Math.floor(Math.random() * negativeEmojis.length)];
-                    evt.target.setAttribute('value', randomNegativeEmoji);
+                    target.setAttribute('value', originalValue); // Повертаємо оригінальний негативний смайл
                 }, 1000);
+            } else if (target.classList.contains('positive-emoji')) {
+                // Ефект для неправильного кліка по позитивному смайлу
+                const originalScale = target.getAttribute('scale');
+                target.setAttribute('scale', '0.4 0.4 0.4'); // Збільшуємо, наприклад
+                setTimeout(() => {
+                    target.setAttribute('scale', originalScale); // Повертаємо початковий розмір
+                }, 200);
             }
         });
     </script>
 </body>
 </html>
-[Free Background Music for kids parties](https://www.youtube.com/watch?v=PMyEgV79EEY)
-Цей відеоролик може бути корисним для вибору фонової музики до гри.
-http://googleusercontent.com/youtube_content/1
