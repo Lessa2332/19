@@ -65,6 +65,11 @@
             background: linear-gradient(45deg, #007BFF, #0056b3);
             color: white;
         }
+        #stopBtn {
+            bottom: 100px;
+            background: linear-gradient(45deg, #ff0000, #b30000);
+            color: white;
+        }
         #resetBtn {
             bottom: 40px;
             background: linear-gradient(45deg, #FF5733, #e64a19);
@@ -157,11 +162,11 @@
             ></a-image>
 
             <a-entity id="game-elements" visible="false">
-                <a-text class="emotion-emoji negative-emoji" value="😭" position="-0.5 0.2 0" scale="0.3 0.3 0.3"></a-text>
-                <a-text class="emotion-emoji negative-emoji" value="😠" position="0 0.2 0" scale="0.3 0.3 0.3"></a-text>
-                <a-text class="emotion-emoji negative-emoji" value="🤢" position="0.5 0.2 0" scale="0.3 0.3 0.3"></a-text>
-                <a-text class="emotion-emoji negative-emoji" value="😨" position="-0.5 -0.2 0" scale="0.3 0.3 0.3"></a-text>
-                <a-text class="emotion-emoji negative-emoji" value="😭" position="0 -0.2 0" scale="0.3 0.3 0.3"></a-text>
+                <a-text class="emotion-emoji negative-emoji" value="😭" position="-0.5 0.2 0" scale="1 1 1"></a-text>
+                <a-text class="emotion-emoji negative-emoji" value="😠" position="0 0.2 0" scale="1 1 1"></a-text>
+                <a-text class="emotion-emoji negative-emoji" value="🤢" position="0.5 0.2 0" scale="1 1 1"></a-text>
+                <a-text class="emotion-emoji negative-emoji" value="😨" position="-0.5 -0.2 0" scale="1 1 1"></a-text>
+                <a-text class="emotion-emoji negative-emoji" value="😭" position="0 -0.2 0" scale="1 1 1"></a-text>
 
                 <a-entity id="sparkle-emitter" particle-system="
                     preset: star;
@@ -183,6 +188,7 @@
     </a-scene>
 
     <button id="playBtn" class="ui-btn">▶️ ГРАТИ</button>
+    <button id="stopBtn" class="ui-btn" style="display: none;">⏹️ СТОП</button>
     <button id="resetBtn" class="ui-btn">🔄 Повернутися</button>
     <a href="https://www.youtube.com/@23smartlessa32?si=d3NhKDot8U8Mc2Hi" id="youtubeBtn" target="_blank">Автор SmartLessa</a>
 
@@ -197,6 +203,7 @@
         const targetEntity = document.querySelector('a-entity[mindar-image-target]');
         const logoImage = document.querySelector('#logo-image');
         const playBtn = document.querySelector('#playBtn');
+        const stopBtn = document.querySelector('#stopBtn'); // Нова кнопка
         const resetBtn = document.querySelector('#resetBtn');
         const youtubeBtn = document.querySelector('#youtubeBtn');
         const gameElements = document.querySelector('#game-elements');
@@ -221,7 +228,6 @@
             timerText.textContent = `Час: ${formattedTime}`;
         }
 
-        // Цей обробник тепер лише показує кнопки, коли знайдено маркер
         targetEntity.addEventListener('targetFound', function () {
             loader.style.display = 'none';
             if (!isGameRunning) {
@@ -231,13 +237,11 @@
             }
         });
 
-        // Цей обробник тепер лише перевіряє, чи гра не запущена, інакше нічого не робить
         targetEntity.addEventListener('targetLost', function () {
             if (!isGameRunning) {
-                // Ховаємо кнопки та елементи, тільки якщо гра не в процесі
                 playBtn.style.display = 'none';
                 youtubeBtn.style.display = 'none';
-                resetBtn.style.display = 'none'; // Додано для повної синхронізації
+                resetBtn.style.display = 'none';
                 logoImage.setAttribute('visible', 'true');
                 gameElements.setAttribute('visible', 'false');
                 timerText.style.display = 'none';
@@ -245,23 +249,9 @@
             }
         });
 
-        playBtn.addEventListener('click', function () {
-            startGame();
-        });
-
-        resetBtn.addEventListener('click', function () {
-            stopGame();
-            resetBtn.style.display = 'none';
-            playBtn.style.display = 'block';
-            youtubeBtn.style.display = 'block';
-            logoImage.setAttribute('visible', 'true');
-            gameElements.setAttribute('visible', 'false');
-            score = 0;
-            timer = 60;
-            updateTimerDisplay();
-            timerText.style.display = 'none';
-            scoreText.style.display = 'none';
-        });
+        playBtn.addEventListener('click', startGame);
+        stopBtn.addEventListener('click', stopGame); // Новий обробник для кнопки "Стоп"
+        resetBtn.addEventListener('click', resetGame);
 
         function startGame() {
             isGameRunning = true;
@@ -271,11 +261,12 @@
             updateTimerDisplay();
 
             logoImage.setAttribute('visible', 'false');
-            gameElements.setAttribute('visible', 'true'); // Тепер цей рядок точно спрацює!
+            gameElements.setAttribute('visible', 'true');
             timerText.style.display = 'block';
             scoreText.style.display = 'block';
             playBtn.style.display = 'none';
             youtubeBtn.style.display = 'none';
+            stopBtn.style.display = 'block'; // Показуємо кнопку "Стоп"
             
             bgMusic.play();
 
@@ -291,13 +282,36 @@
         }
 
         function stopGame() {
+            if (!isGameRunning) return;
             isGameRunning = false;
             clearInterval(gameInterval);
             clearInterval(movementInterval);
             bgMusic.pause();
             bgMusic.currentTime = 0;
+
+            // Ховаємо смайли та показуємо кнопки "Грати" і "Скинути"
+            gameElements.setAttribute('visible', 'false');
+            stopBtn.style.display = 'none';
+            resetBtn.style.display = 'block';
+            playBtn.style.display = 'block'; // Додано, щоб можна було почати гру знову
+            youtubeBtn.style.display = 'block';
+            logoImage.setAttribute('visible', 'true');
         }
 
+        function resetGame() {
+            stopGame(); // Скидаємо гру
+            playBtn.style.display = 'block';
+            youtubeBtn.style.display = 'block';
+            resetBtn.style.display = 'none';
+            logoImage.setAttribute('visible', 'true');
+            score = 0;
+            timer = 60;
+            updateTimerDisplay();
+            scoreText.textContent = `Радість: ${score}`;
+            timerText.style.display = 'none';
+            scoreText.style.display = 'none';
+        }
+        
         function endGame() {
             stopGame();
             
@@ -361,7 +375,7 @@
                 }, 1000);
             } else if (target.classList.contains('positive-emoji')) {
                 const originalScale = target.getAttribute('scale');
-                target.setAttribute('scale', '0.4 0.4 0.4');
+                target.setAttribute('scale', '1.2 1.2 1.2');
                 setTimeout(() => {
                     target.setAttribute('scale', originalScale);
                 }, 200);
@@ -370,4 +384,3 @@
     </script>
 </body>
 </html>
-
