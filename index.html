@@ -157,11 +157,11 @@
             ></a-image>
 
             <a-entity id="game-elements" visible="false">
-                <a-text class="emotion-emoji positive-emoji" value="😊" position="-0.5 0.2 0" scale="0.3 0.3 0.3"></a-text>
-                <a-text class="emotion-emoji negative-emoji" value="😭" position="0 0.2 0" scale="0.3 0.3 0.3"></a-text>
-                <a-text class="emotion-emoji negative-emoji" value="😠" position="0.5 0.2 0" scale="0.3 0.3 0.3"></a-text>
-                <a-text class="emotion-emoji negative-emoji" value="🤢" position="-0.5 -0.2 0" scale="0.3 0.3 0.3"></a-text>
-                <a-text class="emotion-emoji negative-emoji" value="😨" position="0 -0.2 0" scale="0.3 0.3 0.3"></a-text>
+                <a-text class="emotion-emoji negative-emoji" value="😭" position="-0.5 0.2 0" scale="0.3 0.3 0.3"></a-text>
+                <a-text class="emotion-emoji negative-emoji" value="😠" position="0 0.2 0" scale="0.3 0.3 0.3"></a-text>
+                <a-text class="emotion-emoji negative-emoji" value="🤢" position="0.5 0.2 0" scale="0.3 0.3 0.3"></a-text>
+                <a-text class="emotion-emoji negative-emoji" value="😨" position="-0.5 -0.2 0" scale="0.3 0.3 0.3"></a-text>
+                <a-text class="emotion-emoji negative-emoji" value="😭" position="0 -0.2 0" scale="0.3 0.3 0.3"></a-text>
 
                 <a-entity id="sparkle-emitter" particle-system="
                     preset: star;
@@ -209,7 +209,7 @@
         let timer = 60;
         let gameInterval;
         let movementInterval;
-        let isGameRunning = false; // Нова змінна-прапорець
+        let isGameRunning = false;
 
         const negativeEmojis = ['😭', '😠', '🤢', '😨'];
         const positiveEmojis = ['😊', '😂', '🤩', '🥳'];
@@ -221,6 +221,7 @@
             timerText.textContent = `Час: ${formattedTime}`;
         }
 
+        // Цей обробник тепер лише показує кнопки, коли знайдено маркер
         targetEntity.addEventListener('targetFound', function () {
             loader.style.display = 'none';
             if (!isGameRunning) {
@@ -230,12 +231,13 @@
             }
         });
 
+        // Цей обробник тепер лише перевіряє, чи гра не запущена, інакше нічого не робить
         targetEntity.addEventListener('targetLost', function () {
             if (!isGameRunning) {
-                stopGame();
+                // Ховаємо кнопки та елементи, тільки якщо гра не в процесі
                 playBtn.style.display = 'none';
-                resetBtn.style.display = 'none';
                 youtubeBtn.style.display = 'none';
+                resetBtn.style.display = 'none'; // Додано для повної синхронізації
                 logoImage.setAttribute('visible', 'true');
                 gameElements.setAttribute('visible', 'false');
                 timerText.style.display = 'none';
@@ -244,8 +246,6 @@
         });
 
         playBtn.addEventListener('click', function () {
-            playBtn.style.display = 'none';
-            youtubeBtn.style.display = 'none';
             startGame();
         });
 
@@ -254,27 +254,28 @@
             resetBtn.style.display = 'none';
             playBtn.style.display = 'block';
             youtubeBtn.style.display = 'block';
-            gameElements.setAttribute('visible', 'false');
             logoImage.setAttribute('visible', 'true');
+            gameElements.setAttribute('visible', 'false');
             score = 0;
             timer = 60;
             updateTimerDisplay();
-            scoreText.textContent = `Радість: ${score}`;
             timerText.style.display = 'none';
             scoreText.style.display = 'none';
         });
 
         function startGame() {
-            isGameRunning = true; // Встановлюємо, що гра запущена
+            isGameRunning = true;
             score = 0;
             timer = 60;
             scoreText.textContent = `Радість: ${score}`;
             updateTimerDisplay();
 
             logoImage.setAttribute('visible', 'false');
-            gameElements.setAttribute('visible', 'true');
+            gameElements.setAttribute('visible', 'true'); // Тепер цей рядок точно спрацює!
             timerText.style.display = 'block';
             scoreText.style.display = 'block';
+            playBtn.style.display = 'none';
+            youtubeBtn.style.display = 'none';
             
             bgMusic.play();
 
@@ -290,7 +291,7 @@
         }
 
         function stopGame() {
-            isGameRunning = false; // Встановлюємо, що гра зупинена
+            isGameRunning = false;
             clearInterval(gameInterval);
             clearInterval(movementInterval);
             bgMusic.pause();
