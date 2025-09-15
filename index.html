@@ -209,6 +209,7 @@
         let timer = 60;
         let gameInterval;
         let movementInterval;
+        let isGameRunning = false; // Нова змінна-прапорець
 
         const negativeEmojis = ['😭', '😠', '🤢', '😨'];
         const positiveEmojis = ['😊', '😂', '🤩', '🥳'];
@@ -222,20 +223,24 @@
 
         targetEntity.addEventListener('targetFound', function () {
             loader.style.display = 'none';
-            playBtn.style.display = 'block';
-            youtubeBtn.style.display = 'block';
-            logoImage.setAttribute('visible', 'true');
+            if (!isGameRunning) {
+                playBtn.style.display = 'block';
+                youtubeBtn.style.display = 'block';
+                logoImage.setAttribute('visible', 'true');
+            }
         });
 
         targetEntity.addEventListener('targetLost', function () {
-            stopGame();
-            playBtn.style.display = 'none';
-            resetBtn.style.display = 'none';
-            youtubeBtn.style.display = 'none';
-            logoImage.setAttribute('visible', 'true');
-            gameElements.setAttribute('visible', 'false');
-            timerText.style.display = 'none';
-            scoreText.style.display = 'none';
+            if (!isGameRunning) {
+                stopGame();
+                playBtn.style.display = 'none';
+                resetBtn.style.display = 'none';
+                youtubeBtn.style.display = 'none';
+                logoImage.setAttribute('visible', 'true');
+                gameElements.setAttribute('visible', 'false');
+                timerText.style.display = 'none';
+                scoreText.style.display = 'none';
+            }
         });
 
         playBtn.addEventListener('click', function () {
@@ -260,6 +265,7 @@
         });
 
         function startGame() {
+            isGameRunning = true; // Встановлюємо, що гра запущена
             score = 0;
             timer = 60;
             scoreText.textContent = `Радість: ${score}`;
@@ -284,6 +290,7 @@
         }
 
         function stopGame() {
+            isGameRunning = false; // Встановлюємо, що гра зупинена
             clearInterval(gameInterval);
             clearInterval(movementInterval);
             bgMusic.pause();
@@ -308,14 +315,13 @@
             timerText.style.display = 'none';
             scoreText.style.display = 'none';
             
-            // Запускаємо феєрверк наприкінці гри
             sparkleEmitter.setAttribute('particle-system', 'enabled: true; color: #FFD700,#FFFF00; particleCount: 100; maxAge: 2; duration: 0.1; velocity: 0 1 0; velocitySpread: 1 1 1; position: 0 1 0;');
             
             setTimeout(() => {
-                sparkleEmitter.setAttribute('particle-system', 'enabled: false;'); // Вимикаємо емітер
+                sparkleEmitter.setAttribute('particle-system', 'enabled: false;');
                 document.querySelector('#game-elements').removeChild(finalMessage);
                 resetBtn.style.display = 'block';
-            }, 5000); // Повідомлення та ефект тривають 5 секунд
+            }, 5000);
         }
         
         function moveEmojis() {
@@ -337,29 +343,26 @@
                 score++;
                 scoreText.textContent = `Радість: ${score}`;
                 
-                const originalValue = target.getAttribute('value'); // Зберігаємо оригінальний смайл
+                const originalValue = target.getAttribute('value');
                 const originalPosition = target.getAttribute('position');
 
-                // Відображаємо ефект частинок в місці кліку
                 sparkleEmitter.setAttribute('position', originalPosition);
                 sparkleEmitter.setAttribute('particle-system', 'enabled: true;');
                 setTimeout(() => {
                     sparkleEmitter.setAttribute('particle-system', 'enabled: false;');
-                }, 100); // Вимикаємо емітер швидко
+                }, 100);
 
-                // Тимчасово змінюємо смайл на позитивний
                 const randomPositiveEmoji = positiveEmojis[Math.floor(Math.random() * positiveEmojis.length)];
                 target.setAttribute('value', randomPositiveEmoji);
                 
                 setTimeout(() => {
-                    target.setAttribute('value', originalValue); // Повертаємо оригінальний негативний смайл
+                    target.setAttribute('value', originalValue);
                 }, 1000);
             } else if (target.classList.contains('positive-emoji')) {
-                // Ефект для неправильного кліка по позитивному смайлу
                 const originalScale = target.getAttribute('scale');
-                target.setAttribute('scale', '0.4 0.4 0.4'); // Збільшуємо, наприклад
+                target.setAttribute('scale', '0.4 0.4 0.4');
                 setTimeout(() => {
-                    target.setAttribute('scale', originalScale); // Повертаємо початковий розмір
+                    target.setAttribute('scale', originalScale);
                 }, 200);
             }
         });
