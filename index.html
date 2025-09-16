@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🎉 AR Гра "Смайлик-Сюрприз!" — до Дня Смайла! 🎈</title>
 
-    <!-- Виправлено: прибрано зайві пробіли -->
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/IdeaSpaceVR/aframe-particle-system-component@1.1.x/dist/aframe-particle-system-component.min.js"></script>
@@ -170,11 +169,8 @@
         renderer="colorManagement: true; physicallyCorrectLights: true;"
     >
         <a-assets>
-            <!-- Твоя фонова музика -->
             <audio id="bg-music" src="./bg-music.mp3" preload="auto" muted playsinline crossorigin="anonymous"></audio>
-            <!-- Твій логотип -->
             <img id="logo-img" src="./logo.png" crossorigin="anonymous" alt="Логотип гри">
-            <!-- Текстура для частинок -->
             <img id="sparkle-texture" src="https://raw.githubusercontent.com/IdeaSpaceVR/aframe-particle-system-component/master/dist/images/star.png" crossorigin="anonymous" alt="sparkle">
         </a-assets>
 
@@ -191,9 +187,7 @@
             ></a-cursor>
         </a-camera>
 
-        <!-- Використовуємо твій маркер: targetIndex: 0 -->
         <a-entity mindar-image-target="targetIndex: 0">
-            <!-- Логотип, який показується спочатку -->
             <a-image
                 id="logo-image"
                 src="#logo-img"
@@ -204,11 +198,10 @@
             ></a-image>
 
             <a-entity id="game-elements" visible="false">
-                <!-- Великі сумні смайлики — з білим фоном і чорним текстом -->
                 <a-entity
                     class="emoji sad"
                     geometry="primitive: plane; width: 0.4; height: 0.4"
-                    material="shader: flat; color: #FFFFFF; transparent: true; opacity: 0.9"
+                    material="transparent: true; opacity: 0"
                     text="value: 😢; align: center; width: 1.5; color: #000000"
                     position="-0.12 0.12 0"
                     scale="1 1 1"
@@ -217,7 +210,7 @@
                 <a-entity
                     class="emoji sad"
                     geometry="primitive: plane; width: 0.4; height: 0.4"
-                    material="shader: flat; color: #FFFFFF; transparent: true; opacity: 0.9"
+                    material="transparent: true; opacity: 0"
                     text="value: 😞; align: center; width: 1.5; color: #000000"
                     position="0.12 0.12 0"
                     scale="1 1 1"
@@ -226,7 +219,7 @@
                 <a-entity
                     class="emoji sad"
                     geometry="primitive: plane; width: 0.4; height: 0.4"
-                    material="shader: flat; color: #FFFFFF; transparent: true; opacity: 0.9"
+                    material="transparent: true; opacity: 0"
                     text="value: 😟; align: center; width: 1.5; color: #000000"
                     position="0 0 0"
                     scale="1 1 1"
@@ -235,7 +228,7 @@
                 <a-entity
                     class="emoji sad"
                     geometry="primitive: plane; width: 0.4; height: 0.4"
-                    material="shader: flat; color: #FFFFFF; transparent: true; opacity: 0.9"
+                    material="transparent: true; opacity: 0"
                     text="value: 🙁; align: center; width: 1.5; color: #000000"
                     position="-0.12 -0.12 0"
                     scale="1 1 1"
@@ -244,13 +237,12 @@
                 <a-entity
                     class="emoji sad"
                     geometry="primitive: plane; width: 0.4; height: 0.4"
-                    material="shader: flat; color: #FFFFFF; transparent: true; opacity: 0.9"
+                    material="transparent: true; opacity: 0"
                     text="value: 😕; align: center; width: 1.5; color: #000000"
                     position="0.12 -0.12 0"
                     scale="1 1 1"
                 ></a-entity>
 
-                <!-- Феєрверк -->
                 <a-entity id="firework" particle-system="
                     preset: star;
                     texture: #sparkle-texture;
@@ -265,7 +257,6 @@
                     enabled: false;
                 "></a-entity>
 
-                <!-- Веселі смайлики (тимчасові) -->
                 <a-entity id="happy-container"></a-entity>
             </a-entity>
         </a-entity>
@@ -283,10 +274,9 @@
         fixHeight();
         window.addEventListener('resize', fixHeight);
 
-        // Елементи
         const loader = document.querySelector('#loader');
         const targetEntity = document.querySelector('a-entity[mindar-image-target]');
-        const logoImage = document.querySelector('#logo-image'); // твій логотип
+        const logoImage = document.querySelector('#logo-image');
         const playBtn = document.querySelector('#playBtn');
         const stopBtn = document.querySelector('#stopBtn');
         const resetBtn = document.querySelector('#resetBtn');
@@ -297,9 +287,8 @@
         const instruction = document.querySelector('#instruction');
         const firework = document.querySelector('#firework');
         const happyContainer = document.querySelector('#happy-container');
-        const bgMusic = document.querySelector('#bg-music'); // твоя музика
+        const bgMusic = document.querySelector('#bg-music');
 
-        // Змінні гри
         let score = 0;
         let timer = 60;
         let gameInterval;
@@ -307,17 +296,14 @@
         let isGameRunning = false;
         let arStarted = false;
 
-        // Повідомлення для дітей
         const happyMessages = ["Молодець! 😊", "Ура! 🎉", "Круто! 🚀", "Так тримати! 💪", "Супер! ⭐"];
 
-        // Оновлення таймера
         function updateTimerDisplay() {
             const minutes = Math.floor(timer / 60);
             const seconds = timer % 60;
             timerText.textContent = `⏳ Час: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
 
-        // Показ інструкції, якщо AR не запустився (лише один раз)
         setTimeout(() => {
             if (!arStarted) {
                 instruction.style.display = 'block';
@@ -325,7 +311,6 @@
             }
         }, 3000);
 
-        // Подія: знайдено маркер
         targetEntity.addEventListener('targetFound', function () {
             console.log("🎯 Маркер знайдено! Готовий до гри");
             arStarted = true;
@@ -338,7 +323,6 @@
             }
         });
 
-        // Подія: маркер втрачено
         targetEntity.addEventListener('targetLost', function () {
             if (!isGameRunning) {
                 playBtn.style.display = 'none';
@@ -351,12 +335,10 @@
             }
         });
 
-        // Обробники кнопок
         playBtn.addEventListener('click', startGame);
         stopBtn.addEventListener('click', stopGame);
         resetBtn.addEventListener('click', resetGame);
 
-        // Початок гри
         function startGame() {
             console.log("▶️ Початок гри!");
             isGameRunning = true;
@@ -373,16 +355,13 @@
             youtubeBtn.style.display = 'none';
             stopBtn.style.display = 'block';
 
-            // Запуск музики
             if (bgMusic) {
                 bgMusic.muted = false;
                 bgMusic.play().catch(e => console.log("🔇 Музика не запустилася:", e));
             }
 
-            // Рух смайлів
             movementInterval = setInterval(moveEmojis, 1500);
 
-            // Таймер
             gameInterval = setInterval(() => {
                 timer--;
                 updateTimerDisplay();
@@ -392,7 +371,6 @@
             }, 1000);
         }
 
-        // Зупинка гри
         function stopGame() {
             if (!isGameRunning) return;
             isGameRunning = false;
@@ -412,7 +390,6 @@
             if (logoImage) logoImage.setAttribute('visible', 'true');
         }
 
-        // Скидання гри
         function resetGame() {
             stopGame();
             playBtn.style.display = 'block';
@@ -426,26 +403,21 @@
             timerText.style.display = 'none';
             scoreText.style.display = 'none';
 
-            // Прибрати всі веселі смайлики
             while (happyContainer.firstChild) {
                 happyContainer.removeChild(happyContainer.firstChild);
             }
         }
 
-        // Кінець гри
         function endGame() {
             if (!isGameRunning) return;
             stopGame();
 
-            // Прибрати сумні смайлики
             document.querySelectorAll('.sad').forEach(emoji => {
                 emoji.setAttribute('visible', 'false');
             });
 
-            // Показати феєрверк
             firework.setAttribute('particle-system', 'enabled: true;');
 
-            // Випадкове повідомлення
             const message = happyMessages[Math.floor(Math.random() * happyMessages.length)];
             const finalMessage = document.createElement('a-text');
             finalMessage.setAttribute('value', `${message}\nТи зібрав ${score} смайликів! 🎊`);
@@ -459,7 +431,6 @@
             timerText.style.display = 'none';
             scoreText.style.display = 'none';
 
-            // Скинути через 6 секунд
             setTimeout(() => {
                 firework.setAttribute('particle-system', 'enabled: false;');
                 if (finalMessage.parentNode) {
@@ -469,7 +440,6 @@
             }, 6000);
         }
 
-        // Рух смайлів
         function moveEmojis() {
             const minX = -0.15;
             const maxX = 0.15;
@@ -484,17 +454,14 @@
             });
         }
 
-        // Обробка кліку по смайлику
         document.querySelector('a-scene').addEventListener('click', function (evt) {
             const target = evt.target;
             if (target.classList.contains('sad')) {
                 score++;
                 scoreText.textContent = `🌟 Смайликів: ${score}`;
 
-                // Позиція
                 const pos = target.getAttribute('position');
 
-                // Феєрверк на місці
                 const miniFirework = document.createElement('a-entity');
                 miniFirework.setAttribute('particle-system', `
                     preset: star;
@@ -511,23 +478,20 @@
                 `);
                 happyContainer.appendChild(miniFirework);
 
-                // Видалити через 1 сек
                 setTimeout(() => {
                     if (miniFirework.parentNode) {
                         happyContainer.removeChild(miniFirework);
                     }
                 }, 1000);
 
-                // Замінити на веселий смайлик
                 const happyEmoji = document.createElement('a-entity');
                 happyEmoji.setAttribute('geometry', 'primitive: plane; width: 0.4; height: 0.4');
-                happyEmoji.setAttribute('material', 'shader: flat; color: #FFFFFF; transparent: true; opacity: 0.9');
-                happyEmoji.setAttribute('text', 'value: 😄; align: center; width: 1.5; color: #000000');
+                happyEmoji.setAttribute('material', 'transparent: true; opacity: 0');
+                happyEmoji.setAttribute('text', 'value: 😄; align: center; width: 1.5');
                 happyEmoji.setAttribute('position', `${pos.x} ${pos.y} 0.01`);
                 happyEmoji.setAttribute('scale', '0.8 0.8 0.8');
                 happyContainer.appendChild(happyEmoji);
 
-                // Ховати через 0.8 сек
                 setTimeout(() => {
                     if (happyEmoji.parentNode) {
                         happyContainer.removeChild(happyEmoji);
