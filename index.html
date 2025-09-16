@@ -257,5 +257,299 @@
                     texture: #sparkle-texture;
                     color: #FFD700,#FF4500,#32CD32,#1E90FF,#FF69B4;
                     size: 0.15;
-        
+                    particleCount: 150;
+                    maxAge: 3;
+                    velocity: 0 2 0;
+                    velocitySpread: 3 1 3;
+                    positionSpread: 1 1 1;
+                    blending: additive;
+                    enabled: false;
+                "></a-entity>
 
+                <!-- Веселі смайлики (тимчасові) -->
+                <a-entity id="happy-container"></a-entity>
+            </a-entity>
+        </a-entity>
+    </a-scene>
+
+    <button id="playBtn" class="ui-btn">🚀 Почати гру!</button>
+    <button id="stopBtn" class="ui-btn" style="display: none;">🛑 Зупинити</button>
+    <button id="resetBtn" class="ui-btn">🔄 Спробувати ще!</button>
+    <a href="https://www.youtube.com/@23smartlessa32?si=d3NhKDot8U8Mc2Hi" id="youtubeBtn" target="_blank">❤️ Автор SmartLessa</a>
+
+    <script>
+        function fixHeight() {
+            document.body.style.height = window.innerHeight + 'px';
+        }
+        fixHeight();
+        window.addEventListener('resize', fixHeight);
+
+        // Елементи
+        const loader = document.querySelector('#loader');
+        const targetEntity = document.querySelector('a-entity[mindar-image-target]');
+        const logoImage = document.querySelector('#logo-image'); // твій логотип
+        const playBtn = document.querySelector('#playBtn');
+        const stopBtn = document.querySelector('#stopBtn');
+        const resetBtn = document.querySelector('#resetBtn');
+        const youtubeBtn = document.querySelector('#youtubeBtn');
+        const gameElements = document.querySelector('#game-elements');
+        const timerText = document.querySelector('#timerText');
+        const scoreText = document.querySelector('#scoreText');
+        const instruction = document.querySelector('#instruction');
+        const firework = document.querySelector('#firework');
+        const happyContainer = document.querySelector('#happy-container');
+        const bgMusic = document.querySelector('#bg-music'); // твоя музика
+
+        // Змінні гри
+        let score = 0;
+        let timer = 60;
+        let gameInterval;
+        let movementInterval;
+        let isGameRunning = false;
+        let arStarted = false;
+
+        // Повідомлення для дітей
+        const happyMessages = ["Молодець! 😊", "Ура! 🎉", "Круто! 🚀", "Так тримати! 💪", "Супер! ⭐"];
+
+        // Оновлення таймера
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timer / 60);
+            const seconds = timer % 60;
+            timerText.textContent = `⏳ Час: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        // Показ інструкції, якщо AR не запустився
+        setTimeout(() => {
+            if (!arStarted) {
+                instruction.style.display = 'block';
+                console.log("ℹ️ Показано інструкцію");
+            }
+        }, 3000);
+
+        // Подія: знайдено маркер
+        targetEntity.addEventListener('targetFound', function () {
+            console.log("🎯 Маркер знайдено!");
+            arStarted = true;
+            loader.style.display = 'none';
+            instruction.style.display = 'none';
+            if (!isGameRunning) {
+                playBtn.style.display = 'block';
+                youtubeBtn.style.display = 'block';
+                if (logoImage) logoImage.setAttribute('visible', 'true');
+            }
+        });
+
+        // Подія: маркер втрачено
+        targetEntity.addEventListener('targetLost', function () {
+            if (!isGameRunning) {
+                playBtn.style.display = 'none';
+                youtubeBtn.style.display = 'none';
+                resetBtn.style.display = 'none';
+                if (logoImage) logoImage.setAttribute('visible', 'true');
+                gameElements.setAttribute('visible', 'false');
+                timerText.style.display = 'none';
+                scoreText.style.display = 'none';
+            }
+        });
+
+        // Обробники кнопок
+        playBtn.addEventListener('click', startGame);
+        stopBtn.addEventListener('click', stopGame);
+        resetBtn.addEventListener('click', resetGame);
+
+        // Початок гри
+        function startGame() {
+            console.log("▶️ Початок гри!");
+            isGameRunning = true;
+            score = 0;
+            timer = 60;
+            scoreText.textContent = `🌟 Смайликів: ${score}`;
+            updateTimerDisplay();
+
+            if (logoImage) logoImage.setAttribute('visible', 'false');
+            gameElements.setAttribute('visible', 'true');
+            timerText.style.display = 'block';
+            scoreText.style.display = 'block';
+            playBtn.style.display = 'none';
+            youtubeBtn.style.display = 'none';
+            stopBtn.style.display = 'block';
+
+            // Запуск музики
+            if (bgMusic) {
+                bgMusic.muted = false;
+                bgMusic.play().catch(e => console.log("🔇 Музика не запустилася:", e));
+            }
+
+            // Рух смайлів
+            movementInterval = setInterval(moveEmojis, 1500);
+
+            // Таймер
+            gameInterval = setInterval(() => {
+                timer--;
+                updateTimerDisplay();
+                if (timer <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        // Зупинка гри
+        function stopGame() {
+            if (!isGameRunning) return;
+            isGameRunning = false;
+            clearInterval(gameInterval);
+            clearInterval(movementInterval);
+
+            if (bgMusic) {
+                bgMusic.pause();
+                bgMusic.currentTime = 0;
+            }
+
+            gameElements.setAttribute('visible', 'false');
+            stopBtn.style.display = 'none';
+            resetBtn.style.display = 'block';
+            playBtn.style.display = 'block';
+            youtubeBtn.style.display = 'block';
+            if (logoImage) logoImage.setAttribute('visible', 'true');
+        }
+
+        // Скидання гри
+        function resetGame() {
+            stopGame();
+            playBtn.style.display = 'block';
+            youtubeBtn.style.display = 'block';
+            resetBtn.style.display = 'none';
+            if (logoImage) logoImage.setAttribute('visible', 'true');
+            score = 0;
+            timer = 60;
+            updateTimerDisplay();
+            scoreText.textContent = `🌟 Смайликів: ${score}`;
+            timerText.style.display = 'none';
+            scoreText.style.display = 'none';
+
+            // Прибрати всі веселі смайлики
+            while (happyContainer.firstChild) {
+                happyContainer.removeChild(happyContainer.firstChild);
+            }
+        }
+
+        // Кінець гри
+        function endGame() {
+            if (!isGameRunning) return;
+            stopGame();
+
+            // Прибрати сумні смайлики
+            document.querySelectorAll('.sad').forEach(emoji => {
+                emoji.setAttribute('visible', 'false');
+            });
+
+            // Показати феєрверк
+            firework.setAttribute('particle-system', 'enabled: true;');
+
+            // Випадкове повідомлення
+            const message = happyMessages[Math.floor(Math.random() * happyMessages.length)];
+            const finalMessage = document.createElement('a-text');
+            finalMessage.setAttribute('value', `${message}\nТи зібрав ${score} смайликів! 🎊`);
+            finalMessage.setAttribute('position', '0 0.5 0');
+            finalMessage.setAttribute('scale', '0.35 0.35 0.35');
+            finalMessage.setAttribute('align', 'center');
+            finalMessage.setAttribute('color', '#FFFFFF');
+            finalMessage.setAttribute('material', 'shader: flat');
+            happyContainer.appendChild(finalMessage);
+
+            timerText.style.display = 'none';
+            scoreText.style.display = 'none';
+
+            // Скинути через 6 секунд
+            setTimeout(() => {
+                firework.setAttribute('particle-system', 'enabled: false;');
+                if (finalMessage.parentNode) {
+                    happyContainer.removeChild(finalMessage);
+                }
+                resetBtn.style.display = 'block';
+            }, 6000);
+        }
+
+        // Рух смайлів
+        function moveEmojis() {
+            const startX = -0.15;
+            const maxX = 0.15;
+            const startY = -0.15;
+            const maxY = 0.15;
+
+            document.querySelectorAll('.sad').forEach(emoji => {
+                if (!isGameRunning) return;
+                const newPosX = Math.random() * (maxX - startX) + startX;
+                const newPosY = Math.random() * (maxY - startY) + startY;
+                emoji.setAttribute('position', `${newPosX.toFixed(2)} ${newPosY.toFixed(2)} 0`);
+            });
+        }
+
+        // Обробка кліку по смайлику
+        document.querySelector('a-scene').addEventListener('click', function (evt) {
+            const target = evt.target;
+            if (target.classList.contains('sad')) {
+                score++;
+                scoreText.textContent = `🌟 Смайликів: ${score}`;
+
+                // Позиція
+                const pos = target.getAttribute('position');
+
+                // Феєрверк на місці
+                const miniFirework = document.createElement('a-entity');
+                miniFirework.setAttribute('particle-system', `
+                    preset: star;
+                    texture: #sparkle-texture;
+                    color: #FFD700,#FF69B4;
+                    size: 0.1;
+                    particleCount: 30;
+                    maxAge: 1;
+                    velocity: 0 1 0;
+                    velocitySpread: 1 1 1;
+                    position: ${pos.x} ${pos.y} 0;
+                    blending: additive;
+                    enabled: true;
+                `);
+                happyContainer.appendChild(miniFirework);
+
+                // Видалити через 1 сек
+                setTimeout(() => {
+                    if (miniFirework.parentNode) {
+                        happyContainer.removeChild(miniFirework);
+                    }
+                }, 1000);
+
+                // Замінити на веселий смайлик
+                const happyEmoji = document.createElement('a-entity');
+                happyEmoji.setAttribute('geometry', 'primitive: plane; width: 0.4; height: 0.4');
+                happyEmoji.setAttribute('material', 'shader: flat; color: #000000; transparent: true; opacity: 0.9');
+                happyEmoji.setAttribute('text', 'value: 😄; align: center; width: 1.5');
+                happyEmoji.setAttribute('position', `${pos.x} ${pos.y} 0.01`);
+                happyEmoji.setAttribute('scale', '0.8 0.8 0.8');
+                happyContainer.appendChild(happyEmoji);
+
+                // Ховати через 0.8 сек
+                setTimeout(() => {
+                    if (happyEmoji.parentNode) {
+                        happyContainer.removeChild(happyEmoji);
+                    }
+                }, 800);
+            }
+        });
+
+        // 🚀 АВТОЗАПУСК через 5 секунд (для тестування)
+        setTimeout(() => {
+            if (!arStarted && !isGameRunning) {
+                console.log("🚀 Автозапуск гри (тренувальний режим)");
+                loader.style.display = 'none';
+                instruction.style.display = 'none';
+                if (logoImage) logoImage.setAttribute('visible', 'false');
+                gameElements.setAttribute('visible', 'true');
+                startGame();
+            }
+        }, 5000);
+
+        console.log("🎮 Гра 'Смайлик-Сюрприз!' готова! Очікуємо на твій маркер або автозапуск...");
+    </script>
+</body>
+</html>
