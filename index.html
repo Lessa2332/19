@@ -150,13 +150,12 @@
     <div class="arjs-loader" id="loader">
         <div class="pulse">🎉 Ласкаво просимо до гри "Смайлик-Сюрприз!" 🎈</div>
         <div style="margin-top: 20px; font-size: 1.1em;">
-            Наведи камеру на маркер, щоб почати!<br>
-            <small>Або почекай 5 секунд — гра запуститься сама 😊</small>
+            Наведи камеру на маркер, щоб почати гру! 😊
         </div>
     </div>
 
     <div id="instruction">
-        🖼️ Потрібен твій маркер! Надрукуй або покажи зображення, яке використовувалось для генерації <code>targets.mind</code>
+        🖼️ Надрукуй або покажи зображення, яке використовувалось для генерації <code>targets.mind</code>
     </div>
 
     <p id="timerText" class="ui-info-text">⏳ Час: 01:00</p>
@@ -205,12 +204,12 @@
             ></a-image>
 
             <a-entity id="game-elements" visible="false">
-                <!-- Великі сумні смайлики — з geometry та material -->
+                <!-- Великі сумні смайлики — з білим фоном і чорним текстом -->
                 <a-entity
                     class="emoji sad"
                     geometry="primitive: plane; width: 0.4; height: 0.4"
-                    material="shader: flat; color: #000000; transparent: true; opacity: 0.9"
-                    text="value: 😢; align: center; width: 1.5"
+                    material="shader: flat; color: #FFFFFF; transparent: true; opacity: 0.9"
+                    text="value: 😢; align: center; width: 1.5; color: #000000"
                     position="-0.12 0.12 0"
                     scale="1 1 1"
                 ></a-entity>
@@ -218,8 +217,8 @@
                 <a-entity
                     class="emoji sad"
                     geometry="primitive: plane; width: 0.4; height: 0.4"
-                    material="shader: flat; color: #000000; transparent: true; opacity: 0.9"
-                    text="value: 😞; align: center; width: 1.5"
+                    material="shader: flat; color: #FFFFFF; transparent: true; opacity: 0.9"
+                    text="value: 😞; align: center; width: 1.5; color: #000000"
                     position="0.12 0.12 0"
                     scale="1 1 1"
                 ></a-entity>
@@ -227,8 +226,8 @@
                 <a-entity
                     class="emoji sad"
                     geometry="primitive: plane; width: 0.4; height: 0.4"
-                    material="shader: flat; color: #000000; transparent: true; opacity: 0.9"
-                    text="value: 😟; align: center; width: 1.5"
+                    material="shader: flat; color: #FFFFFF; transparent: true; opacity: 0.9"
+                    text="value: 😟; align: center; width: 1.5; color: #000000"
                     position="0 0 0"
                     scale="1 1 1"
                 ></a-entity>
@@ -236,8 +235,8 @@
                 <a-entity
                     class="emoji sad"
                     geometry="primitive: plane; width: 0.4; height: 0.4"
-                    material="shader: flat; color: #000000; transparent: true; opacity: 0.9"
-                    text="value: 🙁; align: center; width: 1.5"
+                    material="shader: flat; color: #FFFFFF; transparent: true; opacity: 0.9"
+                    text="value: 🙁; align: center; width: 1.5; color: #000000"
                     position="-0.12 -0.12 0"
                     scale="1 1 1"
                 ></a-entity>
@@ -245,8 +244,8 @@
                 <a-entity
                     class="emoji sad"
                     geometry="primitive: plane; width: 0.4; height: 0.4"
-                    material="shader: flat; color: #000000; transparent: true; opacity: 0.9"
-                    text="value: 😕; align: center; width: 1.5"
+                    material="shader: flat; color: #FFFFFF; transparent: true; opacity: 0.9"
+                    text="value: 😕; align: center; width: 1.5; color: #000000"
                     position="0.12 -0.12 0"
                     scale="1 1 1"
                 ></a-entity>
@@ -318,17 +317,17 @@
             timerText.textContent = `⏳ Час: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
 
-        // Показ інструкції, якщо AR не запустився
+        // Показ інструкції, якщо AR не запустився (лише один раз)
         setTimeout(() => {
             if (!arStarted) {
                 instruction.style.display = 'block';
-                console.log("ℹ️ Показано інструкцію");
+                console.log("ℹ️ Показано інструкцію — чекаємо на маркер");
             }
         }, 3000);
 
         // Подія: знайдено маркер
         targetEntity.addEventListener('targetFound', function () {
-            console.log("🎯 Маркер знайдено!");
+            console.log("🎯 Маркер знайдено! Готовий до гри");
             arStarted = true;
             loader.style.display = 'none';
             instruction.style.display = 'none';
@@ -472,15 +471,15 @@
 
         // Рух смайлів
         function moveEmojis() {
-            const startX = -0.15;
+            const minX = -0.15;
             const maxX = 0.15;
-            const startY = -0.15;
+            const minY = -0.15;
             const maxY = 0.15;
 
             document.querySelectorAll('.sad').forEach(emoji => {
                 if (!isGameRunning) return;
-                const newPosX = Math.random() * (maxX - startX) + startX;
-                const newPosY = Math.random() * (maxY - startY) + startY;
+                const newPosX = Math.random() * (maxX - minX) + minX;
+                const newPosY = Math.random() * (maxY - minY) + minY;
                 emoji.setAttribute('position', `${newPosX.toFixed(2)} ${newPosY.toFixed(2)} 0`);
             });
         }
@@ -522,8 +521,8 @@
                 // Замінити на веселий смайлик
                 const happyEmoji = document.createElement('a-entity');
                 happyEmoji.setAttribute('geometry', 'primitive: plane; width: 0.4; height: 0.4');
-                happyEmoji.setAttribute('material', 'shader: flat; color: #000000; transparent: true; opacity: 0.9');
-                happyEmoji.setAttribute('text', 'value: 😄; align: center; width: 1.5');
+                happyEmoji.setAttribute('material', 'shader: flat; color: #FFFFFF; transparent: true; opacity: 0.9');
+                happyEmoji.setAttribute('text', 'value: 😄; align: center; width: 1.5; color: #000000');
                 happyEmoji.setAttribute('position', `${pos.x} ${pos.y} 0.01`);
                 happyEmoji.setAttribute('scale', '0.8 0.8 0.8');
                 happyContainer.appendChild(happyEmoji);
@@ -537,19 +536,7 @@
             }
         });
 
-        // 🚀 АВТОЗАПУСК через 5 секунд (для тестування)
-        setTimeout(() => {
-            if (!arStarted && !isGameRunning) {
-                console.log("🚀 Автозапуск гри (тренувальний режим)");
-                loader.style.display = 'none';
-                instruction.style.display = 'none';
-                if (logoImage) logoImage.setAttribute('visible', 'false');
-                gameElements.setAttribute('visible', 'true');
-                startGame();
-            }
-        }, 5000);
-
-        console.log("🎮 Гра 'Смайлик-Сюрприз!' готова! Очікуємо на твій маркер або автозапуск...");
+        console.log("🎮 Гра 'Смайлик-Сюрприз!' готова! Наведи камеру на маркер, щоб почати гру 😊");
     </script>
 </body>
 </html>
