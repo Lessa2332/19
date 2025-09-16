@@ -198,7 +198,7 @@
             ></a-image>
 
             <a-entity id="game-elements" visible="false">
-                <!-- Літери з яскравим фоном -->
+                <!-- Літери з білим фоном і чорним текстом -->
                 <a-entity
                     id="letter1"
                     class="letter"
@@ -233,7 +233,7 @@
                     material="shader: flat; color: #64B5F6; transparent: false;"
                     text="value: Й; align: center; width: 1.5; color: #000000; font: exo2bold"
                     position="-0.3 -0.3 0"
-                ></a-entity>
+                ></a.entity>
 
                 <a-entity
                     id="letter5"
@@ -242,7 +242,7 @@
                     material="shader: flat; color: #BA68C8; transparent: false;"
                     text="value: Л; align: center; width: 1.5; color: #000000; font: exo2bold"
                     position="0.3 -0.3 0"
-                ></a-entity>
+                ></a.entity>
 
                 <a-entity id="firework" particle-system="
                     preset: star;
@@ -447,15 +447,15 @@
         }
 
         function moveLetters() {
-            const minX = -0.4;
+            const startX = -0.4;
             const maxX = 0.4;
-            const minY = -0.4;
+            const startY = -0.4;
             const maxY = 0.4;
 
             document.querySelectorAll('.letter').forEach(letter => {
                 if (!isGameRunning) return;
-                const newPosX = Math.random() * (maxX - minX) + minX;
-                const newPosY = Math.random() * (maxY - minY) + minY;
+                const newPosX = Math.random() * (maxX - startX) + startX;
+                const newPosY = Math.random() * (maxY - startY) + startY;
                 letter.setAttribute('position', `${newPosX.toFixed(2)} ${newPosY.toFixed(2)} 0`);
             });
         }
