@@ -95,10 +95,10 @@
         }
         .ui-info-text {
             position: fixed;
-            left: 10px; /* Зміщено в лівий верхній кут */
-            top: 10px; /* Зміщено вгору */
-            transform: none; /* Прибрано центровку */
-            z-index: 500; /* Нижче canvas */
+            left: 10px;
+            top: 10px;
+            transform: none;
+            z-index: 500;
             font-family: 'Comic Sans MS', cursive, sans-serif;
             text-align: left;
             font-weight: bold;
@@ -110,7 +110,7 @@
             display: none;
         }
         #scoreText {
-            top: 50px; /* Зміщено нижче timerText */
+            top: 50px;
             color: #00FF7F;
             font-size: 1.4em;
             display: none;
@@ -132,7 +132,7 @@
             line-height: 1.4;
         }
         #canvasGameContainer {
-            z-index: 1000; /* Вище текстів */
+            z-index: 1000;
             position: relative;
         }
         @keyframes pulse {
@@ -179,6 +179,7 @@
         <a-assets>
             <audio id="bg-music" src="./bg-music.mp3" preload="auto" muted playsinline crossorigin="anonymous"></audio>
             <audio id="click-sound" src="./click-sound.mp3" preload="auto" playsinline crossorigin="anonymous"></audio>
+            <audio id="logo-sound" src="./lab.mp3" preload="auto" playsinline crossorigin="anonymous"></audio>
             <img id="logo-img" src="./logo.png" crossorigin="anonymous" alt="Логотип гри">
         </a-assets>
 
@@ -235,6 +236,7 @@
         const scoreText = document.getElementById('scoreText');
         const instruction = document.querySelector('#instruction');
         const bgMusic = document.querySelector('#bg-music');
+        const logoSound = document.querySelector('#logo-sound');
         const endMessage = document.getElementById('endMessage');
 
         let isGameRunning = false;
@@ -260,6 +262,10 @@
                 playBtn.style.display = 'block';
                 youtubeBtn.style.display = 'block';
                 if (logoImage) logoImage.setAttribute('visible', 'true');
+                if (logoSound) {
+                    logoSound.currentTime = 0;
+                    logoSound.play().catch(e => console.log("🔇 Звук логотипу не запустився:", e));
+                }
             }
         });
 
@@ -342,7 +348,8 @@
                     vx: (Math.random() - 0.5) * 4,
                     vy: (Math.random() - 0.5) * 4,
                     value: sadEmojis[Math.floor(Math.random() * sadEmojis.length)],
-                    isClicked: false
+                    isClicked: false,
+                    fadeOut: 0
                 };
             }
 
@@ -370,12 +377,13 @@
                 const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
 
                 emojis.forEach((emoji, index) => {
-                    if (emoji.isClicked) return;
+                    if (emoji.isClicked || emoji.fadeOut > 0) return;
                     const dx = x - emoji.x;
                     const dy = y - emoji.y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
                     if (distance < emoji.size / 1.5) {
                         emoji.isClicked = true;
+                        emoji.fadeOut = 1;
                         emoji.value = happyEmojis[Math.floor(Math.random() * happyEmojis.length)];
                         score++;
                         scoreText.textContent = `🌟 Смайликів: ${score}`;
@@ -383,9 +391,6 @@
                         if (clickSound) {
                             clickSound.currentTime = 0;
                             clickSound.play().catch(e => console.log("🔇 Звук кліку не запустився:", e));
-                        }
-                        if (emojis.length < maxEmojisOnScreen) {
-                            emojis.push(createEmoji());
                         }
                     }
                 });
@@ -404,19 +409,30 @@
 
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                emojis = emojis.filter(emoji => !emoji.isClicked);
+                emojis = emojis.filter(emoji => emoji.fadeOut > 0 || !emoji.isClicked);
                 emojis.forEach(emoji => {
-                    emoji.x += emoji.vx;
-                    emoji.y += emoji.vy;
-                    if (emoji.x < 0 || emoji.x > canvas.width) emoji.vx *= -1;
-                    if (emoji.y < 0 || emoji.y > canvas.height) emoji.vy *= -1;
+                    if (emoji.isClicked && emoji.fadeOut > 0) {
+                        emoji.fadeOut -= 0.1; // Плавне зникнення (~10 кадрів)
+                        ctx.globalAlpha = emoji.fadeOut;
+                    } else if (!emoji.isClicked) {
+                        emoji.x += emoji.vx;
+                        emoji.y += emoji.vy;
+                        if (emoji.x < 0 || emoji.x > canvas.width) emoji.vx *= -1;
+                        if (emoji.y < 0 || emoji.y > canvas.height) emoji.vy *= -1;
+                    }
 
                     ctx.font = `${emoji.size}px Arial`;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillStyle = emoji.isClicked ? '#FFD700' : 'white';
                     ctx.fillText(emoji.value, emoji.x, emoji.y);
+                    ctx.globalAlpha = 1;
                 });
+
+                // Додаємо новий смайл після зникнення
+                if (emojis.length < maxEmojisOnScreen && emojis.every(e => !e.isClicked || e.fadeOut > 0)) {
+                    emojis.push(createEmoji());
+                }
 
                 const elapsed = Math.floor((Date.now() - startTime) / 1000);
                 const remaining = 60 - elapsed;
