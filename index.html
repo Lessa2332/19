@@ -76,6 +76,11 @@
             background: linear-gradient(45deg, #54a0ff, #5f27cd);
             color: white;
         }
+        #soundBtn {
+            bottom: 260px;
+            background: linear-gradient(45deg, #00CED1, #20B2AA);
+            color: white;
+        }
         #youtubeBtn {
             position: fixed;
             bottom: 20px;
@@ -181,8 +186,8 @@
     >
         <a-assets>
             <audio id="bg-music" src="./bg-music.mp3" preload="auto" muted playsinline crossorigin="anonymous"></audio>
-            <audio id="click-sound" src="./click-sound.mp3" preload="auto" playsinline crossorigin="anonymous"></audio>
-            <audio id="logo-sound" src="./lab.mp3" preload="auto" playsinline crossorigin="anonymous"></audio>
+            <audio id="click-sound" src="./click-sound.mp3" preload="auto" muted playsinline crossorigin="anonymous"></audio>
+            <audio id="logo-sound" src="./lab.mp3" preload="auto" muted playsinline crossorigin="anonymous"></audio>
             <img id="logo-img" src="./logo.png" crossorigin="anonymous" alt="Логотип гри">
         </a-assets>
 
@@ -217,6 +222,7 @@
     <button id="playBtn" class="ui-btn">🚀 Почати гру!</button>
     <button id="stopBtn" class="ui-btn" style="display: none;">🛑 Зупинити</button>
     <button id="resetBtn" class="ui-btn">🔄 Спробувати ще!</button>
+    <button id="soundBtn" class="ui-btn" style="display: none;">🔊 Увімкнути звук</button>
     <a href="https://www.youtube.com/@23smartlessa32?si=d3NhKDot8U8Mc2Hi" id="youtubeBtn" target="_blank">❤️ Автор SmartLessa</a>
 
     <script>
@@ -232,6 +238,7 @@
         const playBtn = document.querySelector('#playBtn');
         const stopBtn = document.querySelector('#stopBtn');
         const resetBtn = document.querySelector('#resetBtn');
+        const soundBtn = document.querySelector('#soundBtn');
         const youtubeBtn = document.querySelector('#youtubeBtn');
         const gameElements = document.querySelector('#game-elements');
         const timerText = document.getElementById('timerText');
@@ -239,6 +246,7 @@
         const instruction = document.querySelector('#instruction');
         const bgMusic = document.querySelector('#bg-music');
         const logoSound = document.querySelector('#logo-sound');
+        const clickSound = document.querySelector('#click-sound');
         const endMessage = document.getElementById('endMessage');
 
         let isGameRunning = false;
@@ -247,6 +255,45 @@
         let emojis = [];
         let startTime = null;
         let inputHandler = null;
+
+        // Зупинка всіх звуків
+        function stopAllAudio() {
+            if (bgMusic) {
+                bgMusic.pause();
+                bgMusic.currentTime = 0;
+                bgMusic.muted = true;
+            }
+            if (logoSound) {
+                logoSound.pause();
+                logoSound.currentTime = 0;
+                logoSound.muted = true;
+            }
+            if (clickSound) {
+                clickSound.pause();
+                clickSound.currentTime = 0;
+                clickSound.muted = true;
+            }
+        }
+
+        // Обробка втрати фокусу сторінки
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                console.log("ℹ️ Сторінка втратила фокус, зупиняємо звуки");
+                stopAllAudio();
+            }
+        });
+
+        // Кнопка увімкнення звуку
+        soundBtn.addEventListener('click', () => {
+            if (bgMusic) bgMusic.muted = false;
+            if (logoSound) {
+                logoSound.muted = false;
+                logoSound.currentTime = 0;
+                logoSound.play().catch(e => console.log("🔇 Звук логотипу не запустився:", e));
+            }
+            if (clickSound) clickSound.muted = false;
+            soundBtn.style.display = 'none';
+        });
 
         setTimeout(() => {
             if (!arStarted) {
@@ -262,18 +309,16 @@
             instruction.style.display = 'none';
             if (!isGameRunning) {
                 playBtn.style.display = 'block';
+                soundBtn.style.display = 'block';
                 youtubeBtn.style.display = 'block';
                 if (logoImage) logoImage.setAttribute('visible', 'true');
-                if (logoSound) {
-                    logoSound.currentTime = 0;
-                    logoSound.play().catch(e => console.log("🔇 Звук логотипу не запустився:", e));
-                }
             }
         });
 
         targetEntity.addEventListener('targetLost', () => {
             if (isGameRunning) return; // Ігноруємо втрату маркера під час гри
             playBtn.style.display = 'none';
+            soundBtn.style.display = 'none';
             youtubeBtn.style.display = 'none';
             resetBtn.style.display = 'none';
             if (logoImage) logoImage.setAttribute('visible', 'true');
@@ -300,6 +345,7 @@
             console.log("▶️ Початок Canvas-гри!");
             isGameRunning = true;
             playBtn.style.display = 'none';
+            soundBtn.style.display = 'none';
             youtubeBtn.style.display = 'none';
             stopBtn.style.display = 'block';
             resetBtn.style.display = 'none';
@@ -315,6 +361,7 @@
             stopBtn.style.display = 'none';
             resetBtn.style.display = 'none';
             playBtn.style.display = 'block';
+            soundBtn.style.display = 'block';
             youtubeBtn.style.display = 'block';
             document.getElementById('canvasGameContainer').style.display = 'none';
             document.querySelector('a-scene').style.display = 'block';
@@ -322,6 +369,7 @@
             timerText.style.display = 'none';
             scoreText.style.display = 'none';
             if (endMessage) endMessage.style.display = 'none';
+            stopAllAudio();
         }
 
         function resetGame() {
@@ -332,6 +380,7 @@
             scoreText.textContent = `🌟 Смайликів: 0`;
             timerText.textContent = `⏳ Час: 60`;
             playBtn.style.display = 'block';
+            soundBtn.style.display = 'block';
             youtubeBtn.style.display = 'block';
             resetBtn.style.display = 'none';
             if (logoImage) logoImage.setAttribute('visible', 'true');
@@ -343,8 +392,7 @@
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
 
-            if (bgMusic) {
-                bgMusic.muted = false;
+            if (bgMusic && !bgMusic.muted) {
                 bgMusic.play().catch(e => console.log("🔇 Музика не запустилася:", e));
             }
 
@@ -399,8 +447,7 @@
                         emoji.value = happyEmojis[Math.floor(Math.random() * happyEmojis.length)];
                         score++;
                         scoreText.textContent = `🌟 Смайликів: ${score}`;
-                        const clickSound = document.getElementById('click-sound');
-                        if (clickSound) {
+                        if (clickSound && !clickSound.muted) {
                             clickSound.currentTime = 0;
                             clickSound.play().catch(e => console.log("🔇 Звук кліку не запустився:", e));
                         }
@@ -467,6 +514,7 @@
                 scoreText.style.display = 'none';
                 endMessage.textContent = `Гра завершена! Ти зробив ${score} смайлів щасливими! З Днем Смайлика 19 вересня! 😊🎉`;
                 endMessage.style.display = 'block';
+                stopAllAudio();
                 navigator.share({
                     title: 'Смайлик-Сюрприз!',
                     text: `Я зробив ${score} смайлів щасливими! #EmojiChallenge`
