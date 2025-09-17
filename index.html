@@ -32,13 +32,13 @@
             position: absolute;
             top: 0;
             left: 0;
-             background: rgba(135, 206, 235, 0.6);
+            background: rgba(135, 206, 235, 0.6);
             z-index: 9999;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: #000000; /* Чорний текст */
+            color: #000000;
             font-size: 1.5em;
             text-align: center;
             padding: 20px;
@@ -208,7 +208,6 @@
                 scale="2.5 2.5 2.5"
                 visible="true"
             ></a-image>
-
             <a-entity id="game-elements" visible="false">
                 <!-- Тут можна додати допоміжні елементи для AR -->
             </a-entity>
@@ -352,21 +351,17 @@
             const maxEmojisOnScreen = 10;
             const sadEmojis = ['😢', '😞', '😟', '🙁', '😕'];
             const happyEmojis = ['😄', '😂', '😍', '😘', '🥳'];
-            let clickCount = 0; // Лічильник кліків
 
             function createEmoji() {
-                const isHappy = clickCount % 4 === 0; // Кожен 4-й - веселий
                 return {
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
                     size: 40 + Math.random() * 60,
                     vx: (Math.random() - 0.5) * 4,
                     vy: (Math.random() - 0.5) * 4,
-                    value: isHappy ? happyEmojis[Math.floor(Math.random() * happyEmojis.length)] : sadEmojis[Math.floor(Math.random() * sadEmojis.length)],
-                    isHappy: isHappy,
+                    value: sadEmojis[Math.floor(Math.random() * sadEmojis.length)],
                     isClicked: false,
-                    fadeOut: 0,
-                    shake: 0 // Для анімації помилки
+                    fadeOut: 0
                 };
             }
 
@@ -400,23 +395,14 @@
                     const distance = Math.sqrt(dx * dx + dy * dy);
                     if (distance < emoji.size / 1.5) {
                         emoji.isClicked = true;
-                        clickCount++;
-                        if (emoji.isHappy) {
-                            emoji.shake = 10; // Анімація трусіння
-                            emoji.isClicked = false;
-                            emoji.fadeOut = 0;
-                            score--;
-                            scoreText.textContent = `🌟 Смайликів: ${score}`;
-                        } else {
-                            emoji.fadeOut = 1;
-                            emoji.value = happyEmojis[Math.floor(Math.random() * happyEmojis.length)];
-                            score++;
-                            scoreText.textContent = `🌟 Смайликів: ${score}`;
-                            const clickSound = document.getElementById('click-sound');
-                            if (clickSound) {
-                                clickSound.currentTime = 0;
-                                clickSound.play().catch(e => console.log("🔇 Звук кліку не запустився:", e));
-                            }
+                        emoji.fadeOut = 1;
+                        emoji.value = happyEmojis[Math.floor(Math.random() * happyEmojis.length)];
+                        score++;
+                        scoreText.textContent = `🌟 Смайликів: ${score}`;
+                        const clickSound = document.getElementById('click-sound');
+                        if (clickSound) {
+                            clickSound.currentTime = 0;
+                            clickSound.play().catch(e => console.log("🔇 Звук кліку не запустився:", e));
                         }
                         if (emojis.length < maxEmojisOnScreen) {
                             emojis.push(createEmoji());
@@ -438,16 +424,12 @@
 
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                emojis = emojis.filter(emoji => emoji.fadeOut > 0 || emoji.shake > 0 || !emoji.isClicked);
+                emojis = emojis.filter(emoji => emoji.fadeOut > 0 || !emoji.isClicked);
                 emojis.forEach(emoji => {
-                    if (emoji.fadeOut > 0) {
+                    if (emoji.isClicked && emoji.fadeOut > 0) {
                         emoji.fadeOut -= 0.1;
                         ctx.globalAlpha = emoji.fadeOut;
-                    } else if (emoji.shake > 0) {
-                        emoji.shake -= 1;
-                        emoji.x += (Math.random() - 0.5) * 5;
-                        emoji.y += (Math.random() - 0.5) * 5;
-                    } else {
+                    } else if (!emoji.isClicked) {
                         emoji.x += emoji.vx;
                         emoji.y += emoji.vy;
                         if (emoji.x < 0 || emoji.x > canvas.width) emoji.vx *= -1;
@@ -457,10 +439,14 @@
                     ctx.font = `${emoji.size}px Arial`;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    ctx.fillStyle = emoji.isHappy ? '#FFD700' : 'white';
+                    ctx.fillStyle = emoji.isClicked ? '#FFD700' : 'white';
                     ctx.fillText(emoji.value, emoji.x, emoji.y);
                     ctx.globalAlpha = 1;
                 });
+
+                if (emojis.length < maxEmojisOnScreen && emojis.every(e => !e.isClicked || e.fadeOut > 0)) {
+                    emojis.push(createEmoji());
+                }
 
                 const elapsed = Math.floor((Date.now() - startTime) / 1000);
                 const remaining = 60 - elapsed;
@@ -481,6 +467,10 @@
                 scoreText.style.display = 'none';
                 endMessage.textContent = `Гра завершена! Ти зробив ${score} смайлів щасливими! З Днем Смайлика 19 вересня! 😊🎉`;
                 endMessage.style.display = 'block';
+                navigator.share({
+                    title: 'Смайлик-Сюрприз!',
+                    text: `Я зробив ${score} смайлів щасливими! #EmojiChallenge`
+                }).catch(e => console.log("🔗 Шаринг не підтримуюється:", e));
                 setTimeout(() => {
                     endMessage.style.display = 'none';
                     stopGame();
@@ -493,4 +483,3 @@
     </script>
 </body>
 </html>
-
