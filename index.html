@@ -417,20 +417,25 @@
             inputHandler = (e) => {
                 e.preventDefault();
                 const rect = canvas.getBoundingClientRect();
-                const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
-                const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                const x = clientX - rect.left;
+                const y = clientY - rect.top;
+                console.log(`ℹ️ Клік/дотик: x=${x}, y=${y}, rect=${JSON.stringify(rect)}`);
 
                 emojis.forEach((emoji, index) => {
                     if (emoji.isClicked || emoji.fadeOut > 0) return;
                     const dx = x - emoji.x;
                     const dy = y - emoji.y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
-                    if (distance < emoji.size / 1.5) {
+                    console.log(`ℹ️ Emoji ${index}: x=${emoji.x}, y=${emoji.y}, size=${emoji.size}, distance=${distance}`);
+                    if (distance < emoji.size / 2) { // Зменшено з 1.5 до 2 для чутливості
                         emoji.isClicked = true;
                         emoji.fadeOut = 1;
                         emoji.value = happyEmojis[Math.floor(Math.random() * happyEmojis.length)];
                         score++;
                         scoreText.textContent = `🌟 Смайликів: ${score}`;
+                        console.log(`✅ Клік по емодзі ${index}! Score: ${score}`);
                         if (clickSound && !clickSound.muted) {
                             clickSound.currentTime = 0;
                             clickSound.play().catch(e => console.log("🔇 Звук кліку не запустився:", e));
