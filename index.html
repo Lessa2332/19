@@ -32,13 +32,13 @@
             position: absolute;
             top: 0;
             left: 0;
-            background-color: #00ffff;
+            background-color: #87CEEB; /* Блакитний фон */
             z-index: 9999;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: white;
+            color: #000000; /* Чорний текст */
             font-size: 1.5em;
             text-align: center;
             padding: 20px;
@@ -314,7 +314,7 @@
             if (!isGameRunning) return;
             isGameRunning = false;
             stopBtn.style.display = 'none';
-            resetBtn.style.display = 'none'; // Прибираємо resetBtn
+            resetBtn.style.display = 'none';
             playBtn.style.display = 'block';
             youtubeBtn.style.display = 'block';
             document.getElementById('canvasGameContainer').style.display = 'none';
@@ -461,7 +461,7 @@
                 isGameRunning = false;
                 stopBtn.style.display = 'none';
                 resetBtn.style.display = 'block';
-                playBtn.style.display = 'none'; // Приховуємо playBtn при завершенні
+                playBtn.style.display = 'none';
                 timerText.style.display = 'none';
                 scoreText.style.display = 'none';
                 endMessage.textContent = `Гра завершена! Ти зробив ${score} смайлів щасливими! З Днем Смайлика 19 вересня! 😊🎉`;
