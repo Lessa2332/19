@@ -26,25 +26,24 @@
             left: 0;
             background: transparent;
         }
-.arjs-loader {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(135, 206, 235, 0.6); /* напівпрозорий фон */
-    border-radius: 20px;
-    padding: 20px 30px;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: #000;
-    font-size: 1.3em;
-    text-align: center;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-}
-
+        .arjs-loader {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: #87CEEB; /* Блакитний фон */
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #000000; /* Чорний текст */
+            font-size: 1.5em;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
         .ui-btn {
             position: fixed;
             left: 50%;
@@ -494,4 +493,3 @@
     </script>
 </body>
 </html>
-
