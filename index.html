@@ -62,17 +62,17 @@
             font-family: 'Comic Sans MS', cursive, sans-serif;
         }
         #playBtn {
-            bottom: 120px;
+            bottom: 180px;
             background: linear-gradient(45deg, #FF6B6B, #FF8E53);
             color: white;
         }
         #stopBtn {
-            bottom: 120px;
+            bottom: 180px;
             background: linear-gradient(45deg, #ff4757, #ff6b81);
             color: white;
         }
         #resetBtn {
-            bottom: 50px;
+            bottom: 100px;
             background: linear-gradient(45deg, #54a0ff, #5f27cd);
             color: white;
         }
@@ -88,36 +88,36 @@
             font-size: 0.95em;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             display: none;
-            font-family: 'Comic Sans MS', cursive, sans-serif;
+            font-family: Arial, sans-serif;
         }
         #youtubeBtn:hover {
             box-shadow: 0 7px 20px rgba(0, 0, 0, 0.4);
         }
         .ui-info-text {
             position: fixed;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
+            left: 10px; /* Зміщено в лівий верхній кут */
+            top: 10px; /* Зміщено вгору */
+            transform: none; /* Прибрано центровку */
+            z-index: 500; /* Нижче canvas */
             font-family: 'Comic Sans MS', cursive, sans-serif;
-            text-align: center;
+            text-align: left;
             font-weight: bold;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
         #timerText {
-            top: 25px;
             color: #FFD700;
             font-size: 1.4em;
             display: none;
         }
         #scoreText {
-            top: 65px;
+            top: 50px; /* Зміщено нижче timerText */
             color: #00FF7F;
             font-size: 1.4em;
             display: none;
         }
         #instruction {
             position: fixed;
-            bottom: 130px;
+            bottom: 250px;
             left: 50%;
             transform: translateX(-50%);
             color: white;
@@ -130,6 +130,10 @@
             max-width: 90%;
             display: none;
             line-height: 1.4;
+        }
+        #canvasGameContainer {
+            z-index: 1000; /* Вище текстів */
+            position: relative;
         }
         @keyframes pulse {
             0% { transform: scale(1); }
@@ -156,7 +160,6 @@
     <p id="timerText" class="ui-info-text">⏳ Час: 01:00</p>
     <p id="scoreText" class="ui-info-text">🌟 Смайликів: 0</p>
 
-    <!-- Canvas-гра буде замінена тут -->
     <div id="canvasGameContainer" style="display: none;">
         <canvas id="gameCanvas"></canvas>
         <button id="endBtn" class="ui-btn">🛑 Завершити</button>
@@ -236,10 +239,10 @@
 
         let isGameRunning = false;
         let arStarted = false;
-        let score = 0; // Глобальна змінна для очок
-        let emojis = []; // Глобальний масив для смайлів
-        let startTime = null; // Глобальний таймер
-        let inputHandler = null; // Для слухачів подій
+        let score = 0;
+        let emojis = [];
+        let startTime = null;
+        let inputHandler = null;
 
         setTimeout(() => {
             if (!arStarted) {
@@ -281,6 +284,7 @@
             playBtn.style.display = 'none';
             youtubeBtn.style.display = 'none';
             stopBtn.style.display = 'block';
+            resetBtn.style.display = 'none';
             if (logoImage) logoImage.setAttribute('visible', 'false');
             document.querySelector('a-scene').style.display = 'none';
             document.getElementById('canvasGameContainer').style.display = 'block';
@@ -304,10 +308,10 @@
 
         function resetGame() {
             stopGame();
-            score = 0; // Скидаємо очки
-            emojis = []; // Очищаємо смайли
-            startTime = null; // Скидаємо таймер
-            scoreText.textContent = `🌟 Смайликів: 0`; // Оновлюємо текст
+            score = 0;
+            emojis = [];
+            startTime = null;
+            scoreText.textContent = `🌟 Смайликів: 0`;
             timerText.textContent = `⏳ Час: 60`;
             playBtn.style.display = 'block';
             youtubeBtn.style.display = 'block';
@@ -342,7 +346,6 @@
                 };
             }
 
-            // Ініціалізація смайлів лише якщо масив порожній
             if (emojis.length === 0) {
                 for (let i = 0; i < 5; i++) {
                     emojis.push(createEmoji());
@@ -355,13 +358,11 @@
             scoreText.style.display = 'block';
             scoreText.textContent = `🌟 Смайликів: ${score}`;
 
-            // Видаляємо старі слухачі подій
             if (inputHandler) {
                 canvas.removeEventListener('click', inputHandler);
                 canvas.removeEventListener('touchstart', inputHandler);
             }
 
-            // Визначаємо обробник подій
             inputHandler = (e) => {
                 e.preventDefault();
                 const rect = canvas.getBoundingClientRect();
@@ -398,7 +399,7 @@
                 if (!isGameRunning) return;
 
                 const now = Date.now();
-                console.log('FPS:', 1000 / (now - lastTime)); // Моніторинг FPS
+                console.log('FPS:', 1000 / (now - lastTime));
                 lastTime = now;
 
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -430,12 +431,16 @@
 
             function endCanvasGame() {
                 isGameRunning = false;
-                stopGame();
+                stopBtn.style.display = 'none';
+                resetBtn.style.display = 'block';
                 timerText.style.display = 'none';
                 scoreText.style.display = 'none';
                 endMessage.textContent = `Гра завершена! Ти зробив ${score} смайлів щасливими! З Днем Смайлика 19 вересня! 😊🎉`;
                 endMessage.style.display = 'block';
-                setTimeout(() => endMessage.style.display = 'none', 5000);
+                setTimeout(() => {
+                    endMessage.style.display = 'none';
+                    stopGame();
+                }, 5000);
             }
 
             document.getElementById('endBtn').addEventListener('click', endCanvasGame);
@@ -444,4 +449,3 @@
     </script>
 </body>
 </html>
-
