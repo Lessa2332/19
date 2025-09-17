@@ -89,6 +89,9 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             display: none;
             font-family: Arial, sans-serif;
+            z-index: 1100;
+            cursor: pointer;
+            text-decoration: none;
         }
         #youtubeBtn:hover {
             box-shadow: 0 7px 20px rgba(0, 0, 0, 0.4);
@@ -284,6 +287,16 @@
         stopBtn.addEventListener('click', stopGame);
         resetBtn.addEventListener('click', resetGame);
 
+        youtubeBtn.addEventListener('click', () => {
+            console.log("🔗 Клік по YouTube-кнопці!");
+            window.open('https://www.youtube.com/@23smartlessa32?si=d3NhKDot8U8Mc2Hi', '_blank');
+        });
+        youtubeBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            console.log("🔗 Сенсорний клік по YouTube-кнопці!");
+            window.open('https://www.youtube.com/@23smartlessa32?si=d3NhKDot8U8Mc2Hi', '_blank');
+        });
+
         function startCanvasGame() {
             console.log("▶️ Початок Canvas-гри!");
             isGameRunning = true;
@@ -301,7 +314,7 @@
             if (!isGameRunning) return;
             isGameRunning = false;
             stopBtn.style.display = 'none';
-            resetBtn.style.display = 'block';
+            resetBtn.style.display = 'none'; // Прибираємо resetBtn
             playBtn.style.display = 'block';
             youtubeBtn.style.display = 'block';
             document.getElementById('canvasGameContainer').style.display = 'none';
@@ -412,7 +425,7 @@
                 emojis = emojis.filter(emoji => emoji.fadeOut > 0 || !emoji.isClicked);
                 emojis.forEach(emoji => {
                     if (emoji.isClicked && emoji.fadeOut > 0) {
-                        emoji.fadeOut -= 0.1; // Плавне зникнення (~10 кадрів)
+                        emoji.fadeOut -= 0.1;
                         ctx.globalAlpha = emoji.fadeOut;
                     } else if (!emoji.isClicked) {
                         emoji.x += emoji.vx;
@@ -429,7 +442,6 @@
                     ctx.globalAlpha = 1;
                 });
 
-                // Додаємо новий смайл після зникнення
                 if (emojis.length < maxEmojisOnScreen && emojis.every(e => !e.isClicked || e.fadeOut > 0)) {
                     emojis.push(createEmoji());
                 }
@@ -449,6 +461,7 @@
                 isGameRunning = false;
                 stopBtn.style.display = 'none';
                 resetBtn.style.display = 'block';
+                playBtn.style.display = 'none'; // Приховуємо playBtn при завершенні
                 timerText.style.display = 'none';
                 scoreText.style.display = 'none';
                 endMessage.textContent = `Гра завершена! Ти зробив ${score} смайлів щасливими! З Днем Смайлика 19 вересня! 😊🎉`;
@@ -465,4 +478,3 @@
     </script>
 </body>
 </html>
-
