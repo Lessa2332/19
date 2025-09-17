@@ -10,31 +10,156 @@
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
 
     <style>
-        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Comic Sans MS', cursive, sans-serif; }
-        a-scene { width: 100% !important; height: 100% !important; position: fixed; top: 0; left: 0; background: transparent; }
-        .arjs-loader { height: 100%; width: 100%; position: absolute; top: 0; left: 0; background-color: #87CEEB; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #000; font-size: 1.5em; text-align: center; padding: 20px; box-sizing: border-box; }
-        .ui-btn { position: fixed; left: 50%; transform: translateX(-50%); padding: 16px 30px; border-radius: 40px; font-size: 1.2em; font-weight: bold; text-decoration: none; z-index: 1000; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4); transition: all 0.2s ease; cursor: pointer; border: none; display: none; font-family: 'Comic Sans MS', cursive, sans-serif; }
-        #playBtn { bottom: 180px; background: linear-gradient(45deg, #FF6B6B, #FF8E53); color: white; }
-        #stopBtn { bottom: 180px; background: linear-gradient(45deg, #ff4757, #ff6b81); color: white; }
-        #resetBtn { bottom: 100px; background: linear-gradient(45deg, #54a0ff, #5f27cd); color: white; }
-        #youtubeBtn { position: fixed; bottom: 20px; left: 20px; transform: none; padding: 12px 20px; background: linear-gradient(45deg, #ff4757, #ff6348); color: white; border-radius: 25px; font-size: 0.95em; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); display: none; font-family: Arial, sans-serif; z-index: 1100; cursor: pointer; text-decoration: none; }
-        #youtubeBtn:hover { box-shadow: 0 7px 20px rgba(0, 0, 0, 0.4); }
-        .ui-info-text { position: fixed; left: 10px; top: 10px; z-index: 500; font-family: 'Comic Sans MS', cursive, sans-serif; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-        #timerText { color: #FFD700; font-size: 1.4em; display: none; }
-        #scoreText { top: 50px; color: #00FF7F; font-size: 1.4em; display: none; }
-        #instruction { position: fixed; bottom: 250px; left: 50%; transform: translateX(-50%); color: white; font-size: 1.1em; text-align: center; z-index: 9998; background: rgba(74, 21, 75, 0.8); padding: 15px 25px; border-radius: 20px; max-width: 90%; display: none; line-height: 1.4; }
-        #canvasGameContainer { z-index: 1000; position: relative; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-        .pulse { animation: pulse 2s infinite; }
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+        a-scene {
+            width: 100% !important;
+            height: 100% !important;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: transparent;
+        }
+.arjs-loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(135, 206, 235, 0.6); /* напівпрозорий фон */
+    border-radius: 20px;
+    padding: 20px 30px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #000;
+    font-size: 1.3em;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+        .ui-btn {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 16px 30px;
+            border-radius: 40px;
+            font-size: 1.2em;
+            font-weight: bold;
+            text-decoration: none;
+            z-index: 1000;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            display: none;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+        #playBtn {
+            bottom: 180px;
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            color: white;
+        }
+        #stopBtn {
+            bottom: 180px;
+            background: linear-gradient(45deg, #ff4757, #ff6b81);
+            color: white;
+        }
+        #resetBtn {
+            bottom: 100px;
+            background: linear-gradient(45deg, #54a0ff, #5f27cd);
+            color: white;
+        }
+        #youtubeBtn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            transform: none;
+            padding: 12px 20px;
+            background: linear-gradient(45deg, #ff4757, #ff6348);
+            color: white;
+            border-radius: 25px;
+            font-size: 0.95em;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: none;
+            font-family: Arial, sans-serif;
+            z-index: 1100;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        #youtubeBtn:hover {
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.4);
+        }
+        .ui-info-text {
+            position: fixed;
+            left: 10px;
+            top: 10px;
+            transform: none;
+            z-index: 500;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            text-align: left;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        #timerText {
+            color: #FFD700;
+            font-size: 1.4em;
+            display: none;
+        }
+        #scoreText {
+            top: 50px;
+            color: #00FF7F;
+            font-size: 1.4em;
+            display: none;
+        }
+        #instruction {
+            position: fixed;
+            bottom: 250px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 1.1em;
+            text-align: center;
+            z-index: 9998;
+            background: rgba(74, 21, 75, 0.8);
+            padding: 15px 25px;
+            border-radius: 20px;
+            max-width: 90%;
+            display: none;
+            line-height: 1.4;
+        }
+        #canvasGameContainer {
+            z-index: 1000;
+            position: relative;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
     </style>
 </head>
 <body>
     <div class="arjs-loader" id="loader">
-        <div class="pulse">🎉 "Смайлик-Сюрприз!" 🎈</div>
-        <div style="margin-top: 20px; font-size: 1.1em;">Наведи камеру на зображення ! 😊</div>
+        <div class="pulse">🎉 Ласкаво просимо до гри "Смайлик-Сюрприз!" 🎈</div>
+        <div style="margin-top: 20px; font-size: 1.1em;">
+            Наведи камеру на маркер, щоб почати гру! 😊
+        </div>
     </div>
 
-    <div id="instruction">🖼️ Надрукуй або покажи зображення, яке використовувалось для генерації <code>targets.mind</code></div>
+    <div id="instruction">
+        🖼️ Надрукуй або покажи зображення, яке використовувалось для генерації <code>targets.mind</code>
+    </div>
 
     <p id="timerText" class="ui-info-text">⏳ Час: 01:00</p>
     <p id="scoreText" class="ui-info-text">🌟 Смайликів: 0</p>
@@ -44,9 +169,17 @@
         <button id="endBtn" class="ui-btn">🛑 Завершити</button>
     </div>
 
-    <div id="endMessage" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(74,21,75,0.9); color:white; padding:20px; border-radius:15px; z-index:10000; font-size:1.2em; text-align:center; font-family:'Comic Sans MS', cursive; box-shadow:0 8px 20px rgba(0,0,0,0.4);"></div>
+    <div id="endMessage" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(74,21,75,0.9); color:white; padding:20px; border-radius:15px; z-index:10000; font-size:1.2em; text-align:center; font-family:'Comic Sans MS', cursive; box-shadow:0 8px 20px rgba(0,0,0,0.4);">
+    </div>
 
-    <a-scene mindar-image="imageTargetSrc: ./targets.mind;" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false" loading-screen="enabled: false" embedded renderer="colorManagement: true; physicallyCorrectLights: true;">
+    <a-scene
+        mindar-image="imageTargetSrc: ./targets.mind;"
+        vr-mode-ui="enabled: false"
+        device-orientation-permission-ui="enabled: false"
+        loading-screen="enabled: false"
+        embedded
+        renderer="colorManagement: true; physicallyCorrectLights: true;"
+    >
         <a-assets>
             <audio id="bg-music" src="./bg-music.mp3" preload="auto" muted playsinline crossorigin="anonymous"></audio>
             <audio id="click-sound" src="./click-sound.mp3" preload="auto" playsinline crossorigin="anonymous"></audio>
@@ -54,13 +187,32 @@
             <img id="logo-img" src="./logo.png" crossorigin="anonymous" alt="Логотип гри">
         </a-assets>
 
-        <a-camera look-controls="enabled: false" position="0 0 0">
-            <a-cursor raycaster="objects: .emoji;" cursor="fuse: false; maxDistance: 10" position="0 0 -1" geometry="primitive: ring; radiusOuter: 0.015; radiusInner: 0.008" material="color: #FFD700; shader: flat"></a-cursor>
+        <a-camera
+            look-controls="enabled: false"
+            position="0 0 0"
+        >
+            <a-cursor
+                raycaster="objects: .emoji;"
+                cursor="fuse: false; maxDistance: 10"
+                position="0 0 -1"
+                geometry="primitive: ring; radiusOuter: 0.015; radiusInner: 0.008"
+                material="color: #FFD700; shader: flat"
+            ></a-cursor>
         </a-camera>
 
         <a-entity mindar-image-target="targetIndex: 0">
-            <a-image id="logo-image" src="#logo-img" position="0 0 0.05" rotation="30 0 0" scale="2.5 2.5 2.5" visible="true"></a-image>
-            <a-entity id="game-elements" visible="false"></a-entity>
+            <a-image
+                id="logo-image"
+                src="#logo-img"
+                position="0 0 0.05"
+                rotation="30 0 0"
+                scale="2.5 2.5 2.5"
+                visible="true"
+            ></a-image>
+
+            <a-entity id="game-elements" visible="false">
+                <!-- Тут можна додати допоміжні елементи для AR -->
+            </a-entity>
         </a-entity>
     </a-scene>
 
@@ -70,8 +222,11 @@
     <a href="https://www.youtube.com/@23smartlessa32?si=d3NhKDot8U8Mc2Hi" id="youtubeBtn" target="_blank">❤️ Автор SmartLessa</a>
 
     <script>
-        function fixHeight() { document.body.style.height = window.innerHeight + 'px'; }
-        fixHeight(); window.addEventListener('resize', fixHeight);
+        function fixHeight() {
+            document.body.style.height = window.innerHeight + 'px';
+        }
+        fixHeight();
+        window.addEventListener('resize', fixHeight);
 
         const loader = document.querySelector('#loader');
         const targetEntity = document.querySelector('a-entity[mindar-image-target]');
@@ -88,45 +243,69 @@
         const logoSound = document.querySelector('#logo-sound');
         const endMessage = document.getElementById('endMessage');
 
-        let isGameRunning = false, arStarted = false, score = 0, emojis = [], startTime = null, inputHandler = null, emojiCounter = 0;
+        let isGameRunning = false;
+        let arStarted = false;
+        let score = 0;
+        let emojis = [];
+        let startTime = null;
+        let inputHandler = null;
 
-        setTimeout(() => { if (!arStarted) instruction.style.display = 'block'; }, 3000);
+        setTimeout(() => {
+            if (!arStarted) {
+                instruction.style.display = 'block';
+                console.log("ℹ️ Показано інструкцію — чекаємо на маркер");
+            }
+        }, 3000);
 
         targetEntity.addEventListener('targetFound', () => {
+            console.log("🎯 Маркер знайдено!");
             arStarted = true;
             loader.style.display = 'none';
             instruction.style.display = 'none';
             if (!isGameRunning) {
                 playBtn.style.display = 'block';
                 youtubeBtn.style.display = 'block';
-                logoImage.setAttribute('visible', 'true');
-                logoSound.play().catch(() => {});
+                if (logoImage) logoImage.setAttribute('visible', 'true');
+                if (logoSound) {
+                    logoSound.currentTime = 0;
+                    logoSound.play().catch(e => console.log("🔇 Звук логотипу не запустився:", e));
+                }
             }
         });
 
         targetEntity.addEventListener('targetLost', () => {
-            if (!isGameRunning) {
-                playBtn.style.display = 'none';
-                youtubeBtn.style.display = 'none';
-                resetBtn.style.display = 'none';
-                logoImage.setAttribute('visible', 'true');
-                gameElements.setAttribute('visible', 'false');
-                timerText.style.display = 'none';
-                scoreText.style.display = 'none';
-            }
+            if (isGameRunning) return; // Ігноруємо втрату маркера під час гри
+            playBtn.style.display = 'none';
+            youtubeBtn.style.display = 'none';
+            resetBtn.style.display = 'none';
+            if (logoImage) logoImage.setAttribute('visible', 'true');
+            gameElements.setAttribute('visible', 'false');
+            timerText.style.display = 'none';
+            scoreText.style.display = 'none';
         });
 
         playBtn.addEventListener('click', startCanvasGame);
         stopBtn.addEventListener('click', stopGame);
         resetBtn.addEventListener('click', resetGame);
 
+        youtubeBtn.addEventListener('click', () => {
+            console.log("🔗 Клік по YouTube-кнопці!");
+            window.open('https://www.youtube.com/@23smartlessa32?si=d3NhKDot8U8Mc2Hi', '_blank');
+        });
+        youtubeBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            console.log("🔗 Сенсорний клік по YouTube-кнопці!");
+            window.open('https://www.youtube.com/@23smartlessa32?si=d3NhKDot8U8Mc2Hi', '_blank');
+        });
+
         function startCanvasGame() {
+            console.log("▶️ Початок Canvas-гри!");
             isGameRunning = true;
             playBtn.style.display = 'none';
             youtubeBtn.style.display = 'none';
             stopBtn.style.display = 'block';
             resetBtn.style.display = 'none';
-            logoImage.setAttribute('visible', 'false');
+            if (logoImage) logoImage.setAttribute('visible', 'false');
             document.querySelector('a-scene').style.display = 'none';
             document.getElementById('canvasGameContainer').style.display = 'block';
             initCanvasGame();
@@ -141,47 +320,73 @@
             youtubeBtn.style.display = 'block';
             document.getElementById('canvasGameContainer').style.display = 'none';
             document.querySelector('a-scene').style.display = 'block';
-            logoImage.setAttribute('visible', 'true');
+            if (logoImage) logoImage.setAttribute('visible', 'true');
             timerText.style.display = 'none';
             scoreText.style.display = 'none';
-            endMessage.style.display = 'none';
+            if (endMessage) endMessage.style.display = 'none';
         }
 
         function resetGame() {
             stopGame();
-            score = 0; emojis = []; startTime = null; emojiCounter = 0;
+            score = 0;
+            emojis = [];
+            startTime = null;
             scoreText.textContent = `🌟 Смайликів: 0`;
             timerText.textContent = `⏳ Час: 60`;
-            playBtn.style.display = 'block'; youtubeBtn.style.display = 'block'; resetBtn.style.display = 'none';
-            logoImage.setAttribute('visible', 'true');
+            playBtn.style.display = 'block';
+            youtubeBtn.style.display = 'block';
+            resetBtn.style.display = 'none';
+            if (logoImage) logoImage.setAttribute('visible', 'true');
         }
 
         function initCanvasGame() {
             const canvas = document.getElementById('gameCanvas');
             const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
 
-            bgMusic.muted = false; bgMusic.play().catch(() => {});
-
-            const maxEmojisOnScreen = 8;
-            const sadEmojis = ['😢','😞','😟','🙁','😕'];
-            const happyEmojis = ['😄','😂','😍','😘','🥳'];
-
-            function createEmoji() {
-                emojiCounter++;
-                const isTrap = (emojiCounter % 4 === 0);
-                return { x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: 40 + Math.random() * 60,
-                    vx: (Math.random() - 0.5) * 4, vy: (Math.random() - 0.5) * 4,
-                    value: isTrap ? happyEmojis[Math.floor(Math.random() * happyEmojis.length)] : sadEmojis[Math.floor(Math.random() * sadEmojis.length)],
-                    isClicked: false, fadeOut: 0, isTrap: isTrap };
+            if (bgMusic) {
+                bgMusic.muted = false;
+                bgMusic.play().catch(e => console.log("🔇 Музика не запустилася:", e));
             }
 
-            if (emojis.length === 0) for (let i = 0; i < 5; i++) emojis.push(createEmoji());
+            const maxEmojisOnScreen = 10;
+            const sadEmojis = ['😢', '😞', '😟', '🙁', '😕'];
+            const happyEmojis = ['😄', '😂', '😍', '😘', '🥳'];
+            let clickCount = 0; // Лічильник кліків
 
-            startTime = Date.now(); timerText.style.display = 'block'; scoreText.style.display = 'block';
-            timerText.textContent = `⏳ Час: 60`; scoreText.textContent = `🌟 Смайликів: ${score}`;
+            function createEmoji() {
+                const isHappy = clickCount % 4 === 0; // Кожен 4-й - веселий
+                return {
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: 40 + Math.random() * 60,
+                    vx: (Math.random() - 0.5) * 4,
+                    vy: (Math.random() - 0.5) * 4,
+                    value: isHappy ? happyEmojis[Math.floor(Math.random() * happyEmojis.length)] : sadEmojis[Math.floor(Math.random() * sadEmojis.length)],
+                    isHappy: isHappy,
+                    isClicked: false,
+                    fadeOut: 0,
+                    shake: 0 // Для анімації помилки
+                };
+            }
 
-            if (inputHandler) { canvas.removeEventListener('click', inputHandler); canvas.removeEventListener('touchstart', inputHandler); }
+            if (emojis.length === 0) {
+                for (let i = 0; i < 5; i++) {
+                    emojis.push(createEmoji());
+                }
+            }
+
+            startTime = Date.now();
+            timerText.style.display = 'block';
+            timerText.textContent = `⏳ Час: 60`;
+            scoreText.style.display = 'block';
+            scoreText.textContent = `🌟 Смайликів: ${score}`;
+
+            if (inputHandler) {
+                canvas.removeEventListener('click', inputHandler);
+                canvas.removeEventListener('touchstart', inputHandler);
+            }
 
             inputHandler = (e) => {
                 e.preventDefault();
@@ -189,20 +394,33 @@
                 const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
                 const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
 
-                emojis.forEach((emoji) => {
+                emojis.forEach((emoji, index) => {
                     if (emoji.isClicked || emoji.fadeOut > 0) return;
-                    const dx = x - emoji.x, dy = y - emoji.y, distance = Math.sqrt(dx*dx + dy*dy);
+                    const dx = x - emoji.x;
+                    const dy = y - emoji.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
                     if (distance < emoji.size / 1.5) {
-                        emoji.isClicked = true; emoji.fadeOut = 1;
-                        if (emoji.isTrap) {
-                            score = Math.max(0, score - 1);
+                        emoji.isClicked = true;
+                        clickCount++;
+                        if (emoji.isHappy) {
+                            emoji.shake = 10; // Анімація трусіння
+                            emoji.isClicked = false;
+                            emoji.fadeOut = 0;
+                            score--;
                             scoreText.textContent = `🌟 Смайликів: ${score}`;
-                            endMessage.textContent = "Ой! Веселий смайл — не треба було! 😅";
-                            endMessage.style.display = 'block'; setTimeout(() => endMessage.style.display = 'none', 1000);
                         } else {
+                            emoji.fadeOut = 1;
                             emoji.value = happyEmojis[Math.floor(Math.random() * happyEmojis.length)];
-                            score++; scoreText.textContent = `🌟 Смайликів: ${score}`;
-                            const clickSound = document.getElementById('click-sound'); if (clickSound) { clickSound.currentTime = 0; clickSound.play().catch(() => {}); }
+                            score++;
+                            scoreText.textContent = `🌟 Смайликів: ${score}`;
+                            const clickSound = document.getElementById('click-sound');
+                            if (clickSound) {
+                                clickSound.currentTime = 0;
+                                clickSound.play().catch(e => console.log("🔇 Звук кліку не запустився:", e));
+                            }
+                        }
+                        if (emojis.length < maxEmojisOnScreen) {
+                            emojis.push(createEmoji());
                         }
                     }
                 });
@@ -211,36 +429,63 @@
             canvas.addEventListener('click', inputHandler);
             canvas.addEventListener('touchstart', inputHandler, { passive: false });
 
+            let lastTime = Date.now();
             function animate() {
                 if (!isGameRunning) return;
+
+                const now = Date.now();
+                console.log('FPS:', 1000 / (now - lastTime));
+                lastTime = now;
+
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                emojis = emojis.filter(emoji => emoji.fadeOut > 0 || !emoji.isClicked);
+                emojis = emojis.filter(emoji => emoji.fadeOut > 0 || emoji.shake > 0 || !emoji.isClicked);
                 emojis.forEach(emoji => {
-                    if (emoji.isClicked && emoji.fadeOut > 0) { emoji.fadeOut -= 0.1; ctx.globalAlpha = emoji.fadeOut; }
-                    else if (!emoji.isClicked) {
-                        emoji.x += emoji.vx; emoji.y += emoji.vy;
+                    if (emoji.fadeOut > 0) {
+                        emoji.fadeOut -= 0.1;
+                        ctx.globalAlpha = emoji.fadeOut;
+                    } else if (emoji.shake > 0) {
+                        emoji.shake -= 1;
+                        emoji.x += (Math.random() - 0.5) * 5;
+                        emoji.y += (Math.random() - 0.5) * 5;
+                    } else {
+                        emoji.x += emoji.vx;
+                        emoji.y += emoji.vy;
                         if (emoji.x < 0 || emoji.x > canvas.width) emoji.vx *= -1;
                         if (emoji.y < 0 || emoji.y > canvas.height) emoji.vy *= -1;
                     }
-                    ctx.font = `${emoji.size}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                    ctx.fillStyle = emoji.isClicked ? '#FFD700' : 'white'; ctx.fillText(emoji.value, emoji.x, emoji.y); ctx.globalAlpha = 1;
+
+                    ctx.font = `${emoji.size}px Arial`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillStyle = emoji.isHappy ? '#FFD700' : 'white';
+                    ctx.fillText(emoji.value, emoji.x, emoji.y);
+                    ctx.globalAlpha = 1;
                 });
 
-                if (emojis.length < maxEmojisOnScreen && emojis.every(e => !e.isClicked || e.fadeOut > 0)) emojis.push(createEmoji());
-
-                const elapsed = Math.floor((Date.now() - startTime) / 1000), remaining = 60 - elapsed;
-                if (remaining <= 0) { endCanvasGame(); return; }
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const remaining = 60 - elapsed;
+                if (remaining <= 0) {
+                    endCanvasGame();
+                    return;
+                }
                 timerText.textContent = `⏳ Час: ${String(remaining).padStart(2, '0')}`;
+
                 requestAnimationFrame(animate);
             }
 
             function endCanvasGame() {
                 isGameRunning = false;
-                stopBtn.style.display = 'none'; resetBtn.style.display = 'block'; playBtn.style.display = 'none';
-                timerText.style.display = 'none'; scoreText.style.display = 'none';
+                stopBtn.style.display = 'none';
+                resetBtn.style.display = 'block';
+                timerText.style.display = 'none';
+                scoreText.style.display = 'none';
                 endMessage.textContent = `Гра завершена! Ти зробив ${score} смайлів щасливими! З Днем Смайлика 19 вересня! 😊🎉`;
-                endMessage.style.display = 'block'; setTimeout(() => { endMessage.style.display = 'none'; stopGame(); }, 5000);
+                endMessage.style.display = 'block';
+                setTimeout(() => {
+                    endMessage.style.display = 'none';
+                    stopGame();
+                }, 5000);
             }
 
             document.getElementById('endBtn').addEventListener('click', endCanvasGame);
