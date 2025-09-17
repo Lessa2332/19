@@ -244,9 +244,6 @@
         const timerText = document.getElementById('timerText');
         const scoreText = document.getElementById('scoreText');
         const instruction = document.querySelector('#instruction');
-        const bgMusic = document.querySelector('#bg-music');
-        const logoSound = document.querySelector('#logo-sound');
-        const clickSound = document.querySelector('#click-sound');
         const endMessage = document.getElementById('endMessage');
 
         let isGameRunning = false;
@@ -256,8 +253,12 @@
         let startTime = null;
         let inputHandler = null;
 
-        // Зупинка всіх звуків
+        // Зупинка всіх звуків (оновлена версія, яка отримує елементи кожен раз)
         function stopAllAudio() {
+            const bgMusic = document.querySelector('#bg-music');
+            const logoSound = document.querySelector('#logo-sound');
+            const clickSound = document.querySelector('#click-sound');
+
             if (bgMusic) {
                 bgMusic.pause();
                 bgMusic.currentTime = 0;
@@ -285,6 +286,10 @@
 
         // Кнопка увімкнення звуку
         soundBtn.addEventListener('click', () => {
+            const bgMusic = document.querySelector('#bg-music');
+            const logoSound = document.querySelector('#logo-sound');
+            const clickSound = document.querySelector('#click-sound');
+
             if (bgMusic) bgMusic.muted = false;
             if (logoSound) {
                 logoSound.muted = false;
@@ -369,6 +374,8 @@
             timerText.style.display = 'none';
             scoreText.style.display = 'none';
             if (endMessage) endMessage.style.display = 'none';
+
+            // Явна зупинка всіх звуків
             stopAllAudio();
         }
 
@@ -392,6 +399,7 @@
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
 
+            const bgMusic = document.querySelector('#bg-music');
             if (bgMusic && !bgMusic.muted) {
                 bgMusic.play().catch(e => console.log("🔇 Музика не запустилася:", e));
             }
@@ -447,6 +455,7 @@
                         emoji.value = happyEmojis[Math.floor(Math.random() * happyEmojis.length)];
                         score++;
                         scoreText.textContent = `🌟 Смайликів: ${score}`;
+                        const clickSound = document.querySelector('#click-sound');
                         if (clickSound && !clickSound.muted) {
                             clickSound.currentTime = 0;
                             clickSound.play().catch(e => console.log("🔇 Звук кліку не запустився:", e));
@@ -531,4 +540,3 @@
     </script>
 </body>
 </html>
-
