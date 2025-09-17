@@ -9,6 +9,9 @@
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
 
+    <!-- Додаємо Comic Neue для кращого рендерингу на iOS -->
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
         html, body {
             margin: 0;
@@ -16,7 +19,8 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            font-family: 'Comic Sans MS', cursive, sans-serif;
+            font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
+            text-transform: none;
         }
         a-scene {
             width: 100% !important;
@@ -32,7 +36,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            background: rgba(135, 206, 235, 0.1);
+            background: rgba(135, 206, 235, 0.6);
             z-index: 9999;
             display: flex;
             flex-direction: column;
@@ -43,6 +47,8 @@
             text-align: center;
             padding: 20px;
             box-sizing: border-box;
+            font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
+            text-transform: none;
         }
         .ui-btn {
             position: fixed;
@@ -59,7 +65,8 @@
             cursor: pointer;
             border: none;
             display: none;
-            font-family: 'Comic Sans MS', cursive, sans-serif;
+            font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
+            text-transform: none;
         }
         #playBtn {
             bottom: 180px;
@@ -93,10 +100,11 @@
             font-size: 0.95em;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             display: none;
-            font-family: Arial, sans-serif;
+            font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
             z-index: 1100;
             cursor: pointer;
             text-decoration: none;
+            text-transform: none;
         }
         #youtubeBtn:hover {
             box-shadow: 0 7px 20px rgba(0, 0, 0, 0.4);
@@ -107,13 +115,14 @@
             top: 10px;
             transform: none;
             z-index: 500;
-            font-family: 'Comic Sans MS', cursive, sans-serif;
+            font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
             text-align: left;
             font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
+            text-transform: none;
         }
         #timerText {
-            color: #FFD700;
+            color: #00008B; /* Темно-синій для кращого контрасту */
             font-size: 1.4em;
             display: none;
         }
@@ -123,9 +132,31 @@
             font-size: 1.4em;
             display: none;
         }
+        #instruction {
+            position: fixed;
+            bottom: 250px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 1.1em;
+            text-align: center;
+            z-index: 9998;
+            background: rgba(74, 21, 75, 0.8);
+            padding: 15px 25px;
+            border-radius: 20px;
+            max-width: 90%;
+            display: none;
+            line-height: 1.4;
+            font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
+            text-transform: none;
+        }
         #canvasGameContainer {
             z-index: 1000;
             position: relative;
+        }
+        #endMessage {
+            font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
+            text-transform: none;
         }
         @keyframes pulse {
             0% { transform: scale(1); }
@@ -139,10 +170,14 @@
 </head>
 <body>
     <div class="arjs-loader" id="loader">
-        <div class="pulse">🎉"Смайлик-Сюрприз!" 🎈</div>
+        <div class="pulse">🎉 Ласкаво просимо до гри "Смайлик-Сюрприз!" 🎈</div>
         <div style="margin-top: 20px; font-size: 1.1em;">
             Наведи камеру на маркер, щоб почати гру! 😊
         </div>
+    </div>
+
+    <div id="instruction">
+        🖼️ Надрукуй або покажи зображення, яке використовувалось для генерації <code>targets.mind</code>
     </div>
 
     <p id="timerText" class="ui-info-text">⏳ Час: 01:00</p>
@@ -153,7 +188,7 @@
         <button id="endBtn" class="ui-btn">🛑 Завершити</button>
     </div>
 
-    <div id="endMessage" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(74,21,75,0.9); color:white; padding:20px; border-radius:15px; z-index:10000; font-size:1.2em; text-align:center; font-family:'Comic Sans MS', cursive; box-shadow:0 8px 20px rgba(0,0,0,0.4);">
+    <div id="endMessage" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(74,21,75,0.9); color:white; padding:20px; border-radius:15px; z-index:10000; font-size:1.2em; text-align:center; font-family:'Comic Neue', 'Comic Sans MS', cursive; box-shadow:0 8px 20px rgba(0,0,0,0.4);">
     </div>
 
     <a-scene
@@ -203,7 +238,7 @@
     <button id="stopBtn" class="ui-btn" style="display: none;">🛑 Зупинити</button>
     <button id="resetBtn" class="ui-btn">🔄 Спробувати ще!</button>
     <button id="soundBtn" class="ui-btn" style="display: none;">🔊 Увімкнути звук</button>
-    <a href="https://www.youtube.com/playlist?list=PL6UDFwT9TzFw5K8Tzu_OgsDz7vV3N9eY-" target="_blank">❤️ Автор SmartLessa</a>
+    <a href="https://www.youtube.com/@23smartlessa32?si=d3NhKDot8U8Mc2Hi" id="youtubeBtn" target="_blank">❤️ Автор SmartLessa</a>
 
     <script>
         function fixHeight() {
@@ -223,6 +258,10 @@
         const gameElements = document.querySelector('#game-elements');
         const timerText = document.getElementById('timerText');
         const scoreText = document.getElementById('scoreText');
+        const instruction = document.querySelector('#instruction');
+        const bgMusic = document.querySelector('#bg-music');
+        const logoSound = document.querySelector('#logo-sound');
+        const clickSound = document.querySelector('#click-sound');
         const endMessage = document.getElementById('endMessage');
 
         let isGameRunning = false;
@@ -232,12 +271,8 @@
         let startTime = null;
         let inputHandler = null;
 
-        // Зупинка всіх звуків (оновлена версія, яка отримує елементи кожен раз)
+        // Зупинка всіх звуків
         function stopAllAudio() {
-            const bgMusic = document.querySelector('#bg-music');
-            const logoSound = document.querySelector('#logo-sound');
-            const clickSound = document.querySelector('#click-sound');
-
             if (bgMusic) {
                 bgMusic.pause();
                 bgMusic.currentTime = 0;
@@ -265,10 +300,6 @@
 
         // Кнопка увімкнення звуку
         soundBtn.addEventListener('click', () => {
-            const bgMusic = document.querySelector('#bg-music');
-            const logoSound = document.querySelector('#logo-sound');
-            const clickSound = document.querySelector('#click-sound');
-
             if (bgMusic) bgMusic.muted = false;
             if (logoSound) {
                 logoSound.muted = false;
@@ -279,10 +310,18 @@
             soundBtn.style.display = 'none';
         });
 
+        setTimeout(() => {
+            if (!arStarted) {
+                instruction.style.display = 'block';
+                console.log("ℹ️ Показано інструкцію — чекаємо на маркер");
+            }
+        }, 3000);
+
         targetEntity.addEventListener('targetFound', () => {
             console.log("🎯 Маркер знайдено!");
             arStarted = true;
             loader.style.display = 'none';
+            instruction.style.display = 'none';
             if (!isGameRunning) {
                 playBtn.style.display = 'block';
                 soundBtn.style.display = 'block';
@@ -345,8 +384,6 @@
             timerText.style.display = 'none';
             scoreText.style.display = 'none';
             if (endMessage) endMessage.style.display = 'none';
-
-            // Явна зупинка всіх звуків
             stopAllAudio();
         }
 
@@ -370,7 +407,6 @@
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
 
-            const bgMusic = document.querySelector('#bg-music');
             if (bgMusic && !bgMusic.muted) {
                 bgMusic.play().catch(e => console.log("🔇 Музика не запустилася:", e));
             }
@@ -411,7 +447,7 @@
 
             inputHandler = (e) => {
                 e.preventDefault();
-                const rect = canvas.getBoundingClientRect();
+                const rect = canvas.getBoundingRect();
                 const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
                 const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
 
@@ -426,7 +462,6 @@
                         emoji.value = happyEmojis[Math.floor(Math.random() * happyEmojis.length)];
                         score++;
                         scoreText.textContent = `🌟 Смайликів: ${score}`;
-                        const clickSound = document.querySelector('#click-sound');
                         if (clickSound && !clickSound.muted) {
                             clickSound.currentTime = 0;
                             clickSound.play().catch(e => console.log("🔇 Звук кліку не запустився:", e));
@@ -463,7 +498,7 @@
                         if (emoji.y < 0 || emoji.y > canvas.height) emoji.vy *= -1;
                     }
 
-                    ctx.font = `${emoji.size}px Arial`;
+                    ctx.font = `${emoji.size}px 'Comic Neue', 'Comic Sans MS', cursive, sans-serif`;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillStyle = emoji.isClicked ? '#FFD700' : 'white';
@@ -511,4 +546,3 @@
     </script>
 </body>
 </html>
-
